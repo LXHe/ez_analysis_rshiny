@@ -1,0 +1,11 @@
+.shiny-output-error-validation {
+    color: #ff0000;font-weight: bold;
+}
+
+#rawData_normTestRpt {
+    overflow-y: scroll; max-height: 250px;
+}
+
+#rawData_normTestRlt {
+    font-size: 12px;overflow-y: scroll; max-height: 250px; background: ghostwhite;
+}
