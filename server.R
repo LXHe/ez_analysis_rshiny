@@ -5,12 +5,12 @@ library(haven)
 library(shinyBS)
 library(shinyjs)
 
-# Normality test analysis function
+#### Normality test analysis function ####
 normTestAna_func <- function(var, group, ds){
   if (group == "(无)"){
     ds_nest <- ds %>%
       select(all_of(var)) %>%
-      drop_na() %>% 
+      drop_na() %>%
       nest_by() # Nest a full tibble
   }
   else {
@@ -23,7 +23,7 @@ normTestAna_func <- function(var, group, ds){
    mutate(
      sample.size = dim(data)[1],
      t_model = ifelse(
-       sample.size>4,
+       sample.size>50,
        map(data, ~ks.test(x=.x, y="pnorm", mean=mean(.x), sd=sd(.x))),
        ifelse(
          sample.size>=3,
@@ -39,7 +39,7 @@ normTestAna_func <- function(var, group, ds){
  return(ds_final)
 }
 
-# Normality test report function
+#### Normality test report function ####
 normTestFeedback_func <- function(dsList, num_col, cat_col){
   if (cat_col != "(无)"){
     fb_num <- ""
@@ -60,12 +60,12 @@ normTestFeedback_func <- function(dsList, num_col, cat_col){
         }
         fb_cat <- paste0(
           fb_cat,
-          "&emsp;在分组变量<font color=\"#2c7fb8\">", cat_col, "</font>为\"<b>", cat_lvl[j], "</b>\"的水平上的数据", p_eval, " (P=", round(p_num[j],4),")。<br>"
+          "&emsp;在分组变量<font color=\"#2c7fb8\"><b>", cat_col, "</b></font>为\"<b>", cat_lvl[j], "</b>\"的水平上的数据", p_eval, " (P=", round(p_num[j],4),")。<br>"
         )
       }
       fb_num <- paste0(
         fb_num,
-        "对于连续变量<font color=\"#54278f\">", num_col[i],"</font>而言：<br>",
+        "对于连续变量<font color=\"#54278f\"><b>", num_col[i],"</b></font>而言：<br>",
         fb_cat,
         "<br>"
       )
@@ -87,17 +87,18 @@ normTestFeedback_func <- function(dsList, num_col, cat_col){
       }
       fb_num <- paste0(
         fb_num,
-        "对于连续变量<font color=\"#54278f\">", num_col[i],"</font>而言：其数据", p_eval, " (P=", round(p_num,4),")。<br><br>"
+        "对于连续变量<font color=\"#54278f\"><b>", num_col[i],"</b></font>而言：其数据", p_eval, " (P=", round(p_num,4),")。<br><br>"
       )
     }
   }
   return(fb_num)
 }
 
+#### server function ####
 function(input, output, session) {
   
   #### rawData tab ####
-  ## Step 1: Import dataset ##
+  #### Step 1: Import dataset ####
   run_rawData_importFile <- reactive({
     infile <- input$rawData_importFile # Extract infile path
     req(infile) # infile path should be True
@@ -254,7 +255,7 @@ function(input, output, session) {
     )
   })
   
-  ## Step 2: Normality test ##
+  #### Step 2: Normality test ####
   rawData_normTestDs <- eventReactive(
     input$rawData_cfmRun_step2,
     {
@@ -293,6 +294,9 @@ function(input, output, session) {
     }
   )
   
+  output$rawData_normTestRlt <- renderPrint({run_rawData_normTestRlt()})
+  
+  # Normality test report
   run_rawData_normTestRpt <- eventReactive(
     input$rawData_cfmRun_step2,
     {
@@ -303,7 +307,41 @@ function(input, output, session) {
       )
     }
   )
+  
   output$rawData_normTestRpt <- renderText({run_rawData_normTestRpt()})
   
-  output$rawData_normTestRlt <- renderPrint({run_rawData_normTestRlt()})
+  # Normality histogram
+  observe({
+    updatePickerInput(
+      session = session,
+      "rawData_normTestHist_var",
+      choices = input$rawData_normTestContVar,
+      selected = input$rawData_normTestContVar[1]
+    )
+  })
+  
+  run_rawData_normTestHist <- reactive({
+    req(rawData_normTestDs())
+    if (input$rawData_normTestCatVar == "(无)"){group_var <- NULL}
+    else{group_var <- input$rawData_normTestCatVar}
+    
+    rawData_histPlot <- ggplot(
+      data = rawData_normTestDs(), 
+      aes_string(x=input$rawData_normTestHist_var, fill=group_var)) +  
+      geom_histogram(
+        aes(y = ..density..), 
+        alpha = 0.7, 
+        bins=input$rawData_normTestHist_bin, 
+        position="identity", 
+        color="black", 
+        size=0.4
+      )+ 
+      geom_density(alpha=0.6, size=0.3)+
+      labs(x = input$rawData_normTestHist_var,  
+           y = "概率密度",  
+           title = paste0("变量",input$rawData_normTestHist_var,"分布直方图"))
+      ggplotly(rawData_histPlot)
+  })
+  
+  output$rawData_normTestHist <- renderPlotly({run_rawData_normTestHist()})
 }
