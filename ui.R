@@ -7,13 +7,16 @@ library(DT)
 library(shinyWidgets)
 library(shinyjs)
 library(shinyBS)
-library(prompter)
+library(shinybusy)
 library(tidyverse)
 library(plotly)
+library(prompter)
+
 
 #### Header setting ####
 header <- dashboardHeader(
-  title = "运动与健康大数据处理平台",
+  # title = "运动与健康大数据处理平台",
+  title = NULL,
   titleWidth = "22%" # width in percentage
 )
 
@@ -47,16 +50,19 @@ body <- dashboardBody(
     tags$link(rel = "stylesheet", type = "text/css", href = "index.css")
   ),
   
-  use_prompt(),
+  #### Activate shinyjs (library:shinyjs) ####
   useShinyjs(),
   
-  #### Define hover message ####
+  #### Define busy indicator (library:shinybusy) ####
+  add_busy_spinner(spin = "trinity-rings", color = "#3182bd", timeout = 1000),
+  
+  #### Define hover message (library:shinyBS) ####
   bsTooltip(
     id = "rawData_cfmRun_step1",
     title = "每次设定完成后，请点击此按钮更新数据"
   ),
   bsTooltip(
-    id = c("rawData_cfmRun_step2","rawData_cfmRun_step3"),
+    id = c("rawData_cfmRun_step2","rawData_cfmRun_step3","groupCompare_g1_cfmRun_step1"),
     title = "每次设定完成后，请点击此按钮运行本步骤"
   ),
   
@@ -357,7 +363,126 @@ body <- dashboardBody(
         tabBox(
           width = 12,
           tabPanel(
-            title = "两组样本"
+            title = "单组样本",
+            
+            shinydashboardPlus::box(
+              style = "margin: 0px",
+              title = "步骤1：数据准备",
+              status = "primary",
+              width = NULL,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              label = actionBttn(
+                inputId = "groupCompare_g1_cfmRun_step1",
+                label = tags$span(
+                  tags$span(icon("circle-play")),
+                  tags$span("运行", style="font-size: 13px")
+                ),
+                size = "s",
+                color = "primary"
+              ),
+              
+              HTML(
+                "<p>此分析仅适用于<font color=\"#de2d26\"><b>单个组</b></font>中<font color=\"#de2d26\"><b>重复测试</b></font>的<font color=\"#de2d26\"><b>连续变量</b></font>数据。
+                目的在于比较这些重复测试的数据之间是否有差异。<br>例如：在早、中、晚三个时间点测试一批短跑运动员的100米成绩，比较这三个时间点的成绩是否有差别。</p>"
+              ),
+
+              fluidRow(
+                column(
+                  width = 3,
+                  selectInput(
+                    inputId = "groupCompare_g1_repeat",
+                    label = "数据重复测试情况",
+                    choices = c(
+                      "重复测试一次" = "repeat1",
+                      "重复测试两次及以上" = "repeat2"
+                    ),
+                    selected = "重复测试一次"
+                  )
+                ),
+                column(
+                  width = 9,
+                  htmlOutput("groupCompare_g1_tblFormat")
+                )
+              )
+            )
+          ),
+          tabPanel(
+            title = "两组样本",
+            #### Step 1 ####
+            shinydashboardPlus::box(
+              style = "margin: 0px",
+              title = "步骤1：统计方法确定",
+              status = "primary",
+              width = NULL,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              label = actionBttn(
+                inputId = "groupCompare_cfmRun_step1",
+                label = tags$span(
+                  tags$span(icon("circle-play")),
+                  tags$span("运行", style="font-size: 13px")
+                ),
+                size = "s",
+                color = "primary"
+              ),
+              
+              fluidRow(
+                column(
+                  width = 3,
+                  pickerInput(
+                    inputId = "groupCompare_g2_repeat",
+                    label = "数据重复测试情况",
+                    choices = c(
+                      "无重复测试" = "repeat0",
+                      "重复测试1次" = "repeat1",
+                      "重复测试2次及以上" = "repeat2"
+                    ),
+                    selected = "无重复测试"
+                  )
+                ),
+                textOutput("groupCompare_g2_test")
+              )
+            ),
+            
+            #### Step 2 ####
+            shinydashboardPlus::box(
+              style = "margin: 0px",
+              title = "步骤2：数据导入与变量设置",
+              status = "primary",
+              width = NULL,
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              label = actionBttn(
+                inputId = "groupCompare_cfmRun_step2",
+                label = tags$span(
+                  tags$span(icon("circle-play")),
+                  tags$span("运行", style="font-size: 13px")
+                ),
+                size = "s",
+                color = "primary"
+              ),
+              
+              fluidRow(
+                column(
+                  width = 3,
+                  fileInput(
+                    inputId = "groupCompare_importFile", 
+                    label = tags$span(
+                      "数据导入",
+                      tags$span(icon("exclamation-circle")) %>%
+                        add_prompt(
+                          message = "支持csv,excel,SAS和stata文件",
+                          position = "right"
+                        )
+                    ),
+                    accept = c(".csv", ".xlsx", ".xls", ".sas7bdat", ".dta"),
+                    buttonLabel = "选择文件...",
+                    placeholder = "尚未选择"
+                  )
+                )
+              )
+            )
           ),
           tabPanel(
             title = "三组及以上样本"

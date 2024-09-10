@@ -94,10 +94,47 @@ normTestFeedback_func <- function(dsList, num_col, cat_col){
   return(fb_num)
 }
 
+#### Dataframe format ####
+htmlFormat_g1_repeat1 <- htmlTable(
+  matrix(
+    c(1,2,"...","n",
+      10,14,"...",13,
+      20,22,"...",6),
+    ncol=3, byrow = FALSE
+  ),
+  header =  c("ID","T0","T1"),
+  caption = markdown("将进行**配对T检验**（参数检验）或**Wilcoxon符号秩检验**（非参数检验）；数据文件需按照下面的格式准备："),
+  tfoot = markdown("**ID**为受试者编号；**T0**和**T1**分别对应第一次和第二次测试值"),
+  collapse = "separate_shiny"
+)
+
+htmlFormat_g1_repeat2 <- htmlTable(
+  matrix(
+    c(1,"T0",15,
+      1,"T1",20,
+      1,"...",19,
+      1,"Tn",16,
+      2,"T0",25,
+      2,"T1",22,
+      2,"...",18,
+      2,"Tn",20,
+      "...","...","...",
+      "n","T0",10,
+      "n","T1",15,
+      "n","...",12,
+      "n","Tn",17),
+    ncol=3, byrow = TRUE
+  ),
+  header =  c("ID","Timepoint","Value"),
+  caption = markdown("将进行**重复测量方差分析**（参数检验）或**Friedman检验**（非参数检验）；数据文件需按照下面的格式准备："),
+  tfoot = markdown("**ID**为受试者编号；**Timepoint**为测试时间点；**Value**为每个时间点对应的测试值"),
+  collapse = "separate_shiny"
+)
+
 #### server function ####
 function(input, output, session) {
   
-  #### rawData tab ####
+  #### Tab: rawData ####
   #### Step 1: Import dataset ####
   run_rawData_importFile <- reactive({
     infile <- input$rawData_importFile # Extract infile path
@@ -210,18 +247,26 @@ function(input, output, session) {
         )
       }
       
-      # Activate rawData_normTestCatVar button in Step 2
+      # Activate rawData_normTestCatVar button in Step 2 and 3
       if(!is.null(input$rawData_catSelect)){
         shinyjs::enable(id="rawData_normTestCatVar")
+        shinyjs::enable(id="rawData_desCatVar")
         updatePickerInput(
           session = session,
           "rawData_normTestCatVar",
+          choices = c("(无)", input$rawData_catSelect)
+        )
+        updatePickerInput(
+          session = session,
+          "rawData_desCatVar",
           choices = c("(无)", input$rawData_catSelect)
         )
       } 
       else {
         shinyjs::disable(id="rawData_normTestCatVar")
         shinyjs::reset(id="rawData_normTestCatVar")
+        shinyjs::disable(id="rawData_desCatVar")
+        shinyjs::reset(id="rawData_desCatVar")
       }
       
       if(!is.null(input$rawData_contSelect)){
@@ -311,23 +356,33 @@ function(input, output, session) {
   output$rawData_normTestRpt <- renderText({run_rawData_normTestRpt()})
   
   # Normality histogram
-  observe({
-    updatePickerInput(
-      session = session,
-      "rawData_normTestHist_var",
-      choices = input$rawData_normTestContVar,
-      selected = input$rawData_normTestContVar[1]
-    )
-  })
+  observeEvent(
+    input$rawData_cfmRun_step2,
+    {
+      updatePickerInput(
+        session = session,
+        "rawData_normTestHist_var",
+        choices = input$rawData_normTestContVar,
+        selected = input$rawData_normTestContVar[1]
+      )
+    }
+  )
+  
+  normTestGroupVar <- eventReactive(
+    input$rawData_cfmRun_step2,
+    {
+      if (input$rawData_normTestCatVar == "(无)"){"NULL"}
+      else {input$rawData_normTestCatVar}
+    }
+  )
   
   run_rawData_normTestHist <- reactive({
     req(rawData_normTestDs())
-    if (input$rawData_normTestCatVar == "(无)"){group_var <- NULL}
-    else{group_var <- input$rawData_normTestCatVar}
+    req(normTestGroupVar())
     
     rawData_histPlot <- ggplot(
       data = rawData_normTestDs(), 
-      aes_string(x=input$rawData_normTestHist_var, fill=group_var)) +  
+      aes_string(x=input$rawData_normTestHist_var, fill=normTestGroupVar())) +  
       geom_histogram(
         aes(y = ..density..), 
         alpha = 0.7, 
@@ -344,4 +399,97 @@ function(input, output, session) {
   })
   
   output$rawData_normTestHist <- renderPlotly({run_rawData_normTestHist()})
+  
+  #### Step 3: Descriptive table ####
+  run_rawData_desTable <- eventReactive(
+    input$rawData_cfmRun_step3,
+    {
+      req(run_rawData_outFileInfo())
+      
+      if (input$rawData_desCatVar != "(无)"){
+        # Generate parental category line
+        catLength <- length(levels(run_rawData_outFileInfo()[[1]][[input$rawData_desCatVar]]))
+        catStat <- NULL
+        for (i in seq(catLength)){
+          statName <- paste0("stat_", i)
+          catStat <- append(catStat, statName)
+        }
+        table_summary <- run_rawData_outFileInfo()[[1]] %>% 
+          tbl_summary(
+            by = input$rawData_desCatVar,
+            type = all_continuous()~"continuous2",
+            statistic = all_continuous()~c("{mean} ± {sd}", "{median} ({p25}, {p75})", "{min}, {max}"),
+            digits = list(all_continuous()~input$rawData_desDigit),
+            missing_text = "缺失"
+          ) %>% 
+          add_overall() %>%
+          modify_spanning_header(
+            catStat ~ paste0("**", input$rawData_desCatVar, "**")
+          )  %>% 
+          add_p(
+            pvalue_fun = function(x) {
+              if_else(
+                is.na(x), 
+                "未能计算",
+                if_else(x<0.001, "<0.001", format(round(x,3),scientific = F))
+              )
+            }
+          ) %>% 
+          separate_p_footnotes()
+      } else {
+        table_summary <- run_rawData_outFileInfo()[[1]] %>% 
+          tbl_summary(
+            type = all_continuous()~"continuous2",
+            statistic = all_continuous()~c("{mean} ± {sd}", "{median} ({p25}, {p75})", "{min}, {max}"),
+            digits = list(all_continuous()~input$rawData_desDigit),
+            missing_text = "缺失"
+          )
+      }
+      
+      table_summary %>%         
+        modify_header(
+          label ~ "**变量**"
+        ) %>% 
+        modify_caption(
+          "**数据描述表**"
+        ) %>% 
+        bold_labels() %>% 
+        as_gt()
+    }
+  )
+  
+  output$rawData_desTable = render_gt({
+    run_rawData_desTable()
+  })
+  
+  output$download_rawData_desTable_docx = downloadHandler(
+    filename = function(){
+      paste("SummaryTable-", Sys.Date(), ".docx", sep = "")
+    },
+    content = function(file){
+      run_rawData_desTable() %>% 
+        gt::gtsave(filename = file)
+    }
+  )
+  
+  #### Tab: groupCompare ####
+  #### Subtab 1, step 1: 1 group test selection ####
+  run_groupCompare_g1_tblFormat <- eventReactive(
+    input$groupCompare_g1_cfmRun_step1,
+    {
+      if (input$groupCompare_g1_repeat == "repeat1"){
+        htmlFormat_g1_repeat1
+      }
+      else if (input$groupCompare_g1_repeat == "repeat2"){
+        htmlFormat_g1_repeat2
+      }
+    }
+  )
+  
+  output$groupCompare_g1_tblFormat <- renderUI({run_groupCompare_g1_tblFormat()})
+  
+  #### Subtab 2, step 1: 2 group test selection ####
+  output$groupCompare_g2_test <- renderPrint({
+    paste0("Your selection is", input$groupCompare_g2_repeat)
+  })
 }
