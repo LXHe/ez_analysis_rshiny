@@ -22,7 +22,7 @@ color_lvl_5 <- "#FF8C00" # Orange for choice selection and third variable level
 
 #### Header setting ####
 header <- dashboardHeader(
-  # title = "运动与健康大数据处理平台",
+  # title = "运动与健康数据分析平台",
   title = NULL,
   titleWidth = "22%" # width in percentage
 )
@@ -379,10 +379,10 @@ body <- dashboardBody(
               HTML(
                 paste0(
                   "<p>
-                    此分析仅适用于<font color=\"",color_lvl_3,"\"><b>只有一个分组</b></font>的<font color=\"",color_lvl_3,"\"><b>连续变量</b></font>的数据。<br>
-                    <font color=\"",color_lvl_1,"\"><b>示例场景1</b></font>：对某大学某专业一个班的男同学进行了身高测量，现打算分析该班男同学的身高与全国男性的平均身高（1.7米）相比是否有差别。在<b>数据重复测试次数</b>一栏中选择<font color=\"",color_lvl_5,"\"><b>无重复测试</font></b>选项。<br>
-                    <font color=\"",color_lvl_1,"\"><b>示例场景2</b></font>：一批铅球运动员接受了3个月的力量训练，现打算分析力量训练前后他们的铅球成绩是否有差别。在<b>数据重复测试次数</b>一栏中选择<font color=\"",color_lvl_5,"\"><b>重复测试一次</font></b>选项。<br>
-                    <font color=\"",color_lvl_1,"\"><b>示例场景3</b></font>：在早、中、晚三个时间点测试一批短跑运动员的100米成绩，比较这三个时间点的成绩是否有差别。在<b>数据重复测试次数</b>一栏中选择<font color=\"",color_lvl_5,"\"><b>重复测试两次及以上</font></b>选项。
+                    此分析仅适用于<font color=\"",color_lvl_3,"\"><b>只有一个分组</b></font>的<font color=\"",color_lvl_3,"\"><b>连续型</b></font>数据。<br>
+                    <font color=\"",color_lvl_1,"\"><b>示例场景1</b></font>：对某大学某专业一个班的男同学进行了身高测量，现打算分析该班男同学的身高与全国男性的平均身高（1.7米）相比是否有差别。在<em><b>数据重复测试次数</b></em>选项中选择<font color=\"",color_lvl_5,"\"><b>无重复测试</font></b>选项。<br>
+                    <font color=\"",color_lvl_1,"\"><b>示例场景2</b></font>：一批铅球运动员接受了3个月的力量训练，现打算分析力量训练前后他们的铅球成绩是否有差别。在<em><b>数据重复测试次数</b></em>选项中选择<font color=\"",color_lvl_5,"\"><b>重复测试一次</font></b>选项。<br>
+                    <font color=\"",color_lvl_1,"\"><b>示例场景3</b></font>：在早、中、晚三个时间点测试一批短跑运动员的100米成绩，比较这三个时间点的成绩是否有差别。在<em><b>数据重复测试次数</b></em>选项中选择<font color=\"",color_lvl_5,"\"><b>重复测试两次及以上</font></b>选项。
                   </p>"
                 )
               ),
@@ -450,10 +450,11 @@ body <- dashboardBody(
                     inputId = "groupCompare_g1_step2_method",
                     label = "选择统计方法",
                     choices = c(
+                      "单样本t检验",
                       "配对检验",
                       "方差分析"
                     ),
-                    selected = "配对检验"
+                    selected = "单样本t检验"
                   )
                 ),
                 column(
@@ -479,12 +480,12 @@ body <- dashboardBody(
                     column(
                       width = 4,
                       pickerInput(
-                        inputId = "groupCompare_g1_step2_tp",
+                        inputId = "groupCompare_g1_step2_value",
                         label = tags$span(
-                          "选择测试时间点变量",
+                          "选择测试值变量",
                           tags$span(icon("exclamation-circle")) %>%
                             add_prompt(
-                              message = "对应示例中的Timepoint",
+                              message = "对应示例中的Value",
                               position = "right"
                             )
                         ),
@@ -495,7 +496,7 @@ body <- dashboardBody(
                     ),
                     column(
                       width = 4,
-                      uiOutput("groupCompare_g1_step2_valueUI")
+                      uiOutput("groupCompare_g1_step2_tpUI")
                     )
                   )
                 )
