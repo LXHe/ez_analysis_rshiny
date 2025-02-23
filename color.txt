@@ -1,0 +1,6 @@
+#### Define color ####
+color_lvl_1 <- "#54278f" # Dark purple for variable type, first variable level and example
+color_lvl_2 <- "#2c7fb8" # Blue for categorical variable level, second variable level and step
+color_lvl_3 <- "#de2d26" # Red for abnormality and attention
+color_lvl_4 <- "#31a354" # Green for normality and normal status
+color_lvl_5 <- "#FF8C00" # Orange for choice selection and third variable level
