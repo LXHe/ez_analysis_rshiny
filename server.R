@@ -111,8 +111,8 @@ htmlFormat_g1_repeat2 <- htmlTable(
 #### server function ####
 function(input, output, session) {
   
-  #### Tab: rawData ####
-  #### Step 1: Import dataset ####
+  ##### Tab: rawData #####
+  ###### Step 1: Import dataset ######
   run_rawData_step1_importFile <- reactive({importFile_func(input$rawData_step1_importFile)})  
   
   # Update full variables for data input
@@ -224,7 +224,7 @@ function(input, output, session) {
     )
   })
   
-  #### Step 2: Normality test ####
+  ###### Step 2: Normality test ######
   rawData_normTestDs <- eventReactive(
     input$rawData_step2_cfmRun,
     {
@@ -324,7 +324,7 @@ function(input, output, session) {
   
   output$rawData_step2_normTestHist <- renderPlotly({run_rawData_step2_normTestHist()})
   
-  #### Step 3: Descriptive table ####
+  ###### Step 3: Descriptive table ######
   run_rawData_step3_desTable <- eventReactive(
     input$rawData_step3_cfmRun,
     {
@@ -394,8 +394,8 @@ function(input, output, session) {
     }
   )
   
-  #### Tab: groupCompare ####
-  #### Subtab 1, step 1: single group test selection ####
+  ##### Tab: groupCompare #####
+  ###### Subtab 1, step 1: single group test selection ######
   run_groupCompare_g1_step1_tblFormat <- eventReactive(
     input$groupCompare_g1_step1_cfmRun,
     {
@@ -413,7 +413,7 @@ function(input, output, session) {
   
   output$groupCompare_g1_step1_tblFormat <- renderUI({run_groupCompare_g1_step1_tblFormat()})
   
-  #### Subtab 1, step 2: Import dataset ####
+  ###### Subtab 1, step 2: Import dataset ######
   run_groupCompare_g1_step2_importFile <- reactive({importFile_func(input$groupCompare_g1_step2_importFile)})
   
   # Update id variable for data input
@@ -449,7 +449,7 @@ function(input, output, session) {
               "输入想要比较的目标值",
               tags$span(icon("exclamation-circle")) %>%
                 add_prompt(
-                  message = "对应示例场景中的全国平均身高",
+                  message = "对应示例场景1中的全国平均身高",
                   position = "left"
                 )
             ),
@@ -551,19 +551,19 @@ function(input, output, session) {
     return(ana_rlt)
   })
   
-  #### groupCompare_g1_step2_rpt ####
+  ####### groupCompare_g1_step2_rpt #######
   output$groupCompare_g1_step2_rpt <- renderText({
     run_groupCompare_g1_step2_repeat1_test()[["test_report"]]
   })
   
-  #### groupCompare_g1_step2_rlt ####
+  ####### groupCompare_g1_step2_rlt #######
   output$groupCompare_g1_step2_rlt <- renderPrint({
     run_groupCompare_g1_step2_repeat1_test()[["test_result"]]
   })
   
-  #### groupCompare_g1_step2_plot ####
+  ####### groupCompare_g1_step2_plot #######
   # Update UI
-  output$groupCompare_g1_step2_plotUI <- renderUI({
+  output$groupCompare_g1_step2_plotSubUI <- renderUI({
     if (input$groupCompare_g1_step2_plotType=="boxplot"){
       fluidRow(
         width = 12,
@@ -578,7 +578,7 @@ function(input, output, session) {
         width = 12,
         pickerInput(
           inputId = "groupCompare_g1_step2_plotError",
-          label = "误差线呈现",
+          label = "误差线设置",
           choices = c("不显示"="error_0","显示完整误差线"="error_1","显示一半误差线"="error_2")
         )
       )
@@ -706,13 +706,13 @@ function(input, output, session) {
     }
   )
   
-  #### Subtab 2, step 1: two groups test selection ####
+  ###### Subtab 2, step 1: two groups test selection ######
   output$groupCompare_g2_step1_test <- renderPrint({
     paste0("Your selection is", input$groupCompare_g2_step1_repeat)
   })
   
-  #### Tab: dataProcess ####
-  #### Tool 1: Customize missing value ####
+  ##### Tab: dataProcess #####
+  ###### Tool 1: Customize missing value ######
   # Import dataset
   run_dataProcess_missVal_importFile <- reactive({importFile_func(input$dataProcess_missVal_importFile)})
   
@@ -775,7 +775,7 @@ function(input, output, session) {
       )
   }, server = FALSE) # Output the whole records instead of those presented
   
-  #### Tool 2: Format conversion ####
+  ###### Tool 2: Format conversion ######
   # Import dataset
   run_dataProcess_dataFormat_importFile <- reactive({importFile_func(input$dataProcess_dataFormat_importFile)})
   
