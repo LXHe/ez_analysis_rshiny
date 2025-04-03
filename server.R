@@ -689,19 +689,34 @@ function(input, output, session) {
   )
   
   output$groupCompare_g1_step2_plot <- renderPlot({run_groupCompare_g1_step2_plot()})
-  output$groupCompare_g1_step2_plotDownload_png = downloadHandler(
+  output$groupCompare_g1_step2_plotDownload_png <- downloadHandler(
     filename = function(){
-      paste("SingleGroupPlot", Sys.Date(), ".png", sep = "")
+      paste("SingleGroupPlot", Sys.Date(), ".", input$groupCompare_g1_step2_plotDownload_format, sep = "")
     },
-    content = function(file){
-      ggsave(
-        file, 
-        plot = run_groupCompare_g1_step2_plot(), 
-        device = "png",
-        dpi = input$groupCompare_g1_step2_plotDownload_dpi,
-        width = input$groupCompare_g1_step2_plotDownload_width,
-        height = input$groupCompare_g1_step2_plotDownload_ht,
-        units = input$groupCompare_g1_step2_plotDownload_unit
+    content = function(file) {
+      # Process dynamic parameters
+      params <- switch(
+        input$groupCompare_g1_step2_plotDownload_format,
+        png = list(device = "png"),
+        jpeg = list(device = "jpeg", quality = input$groupCompare_g1_step2_plotDownload_quality),
+        pdf = list(device = cairo_pdf, paper = "A4"),
+        svg = list(device = "svg"),
+        list(device = "png") # default
+      )
+      # Save the plot
+      do.call(
+        ggsave, 
+        c(list(
+            filename = file,
+            plot = run_groupCompare_g1_step2_plot(),
+            dpi = input$groupCompare_g1_step2_plotDownload_dpi,
+            width = input$groupCompare_g1_step2_plotDownload_width,
+            height = input$groupCompare_g1_step2_plotDownload_ht,
+            units = input$groupCompare_g1_step2_plotDownload_unit,
+            limitsize=FALSE, # Allow large size
+          ),
+          params
+        )
       )
     }
   )

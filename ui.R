@@ -693,15 +693,14 @@ body <- dashboardBody(
                               inputId = "groupCompare_g1_step2_plotDownload2",
                               label = "下载作图",
                               style = "jelly",
-                              right = FALSE,
-                              up = FALSE,
+                              right = TRUE,
                               icon = icon("download"),
                               status = "primary",
                               size = "s",
                               width = "130%",
                               pickerInput(
                                 inputId = "groupCompare_g1_step2_plotDownload_unit",
-                                label = "选择宽度和高度单位",
+                                label = "选择单位",
                                 choices = c("cm","in","mm","px"),
                                 selected = "in"
                               ),
@@ -720,6 +719,19 @@ body <- dashboardBody(
                                 label = "DPI",
                                 value = 300
                               ),
+                              selectInput(
+                                "groupCompare_g1_step2_plotDownload_format", 
+                                "选择图片格式：",
+                                choices = c("PNG" = "png", "PDF" = "pdf", "JPEG" = "jpeg", "SVG" = "svg"),
+                                selected = "png"
+                              ),
+                              conditionalPanel(
+                                condition = "input.groupCompare_g1_step2_plotDownload_format == 'jpeg'",
+                                sliderInput(
+                                  "groupCompare_g1_step2_plotDownload_quality", 
+                                  "JPEG质量 (0-100):", 
+                                  min = 1, max = 100, value = 90)
+                                ),
                               downloadBttn("groupCompare_g1_step2_plotDownload_png", label = "保存图片", size = "xs")
                             )
                           ),
@@ -738,47 +750,9 @@ body <- dashboardBody(
 
                       )
                     ),
-                    fluidRow(
-                      column(
-                        width = 2,
-                        dropdown(
-                          inputId = "groupCompare_g1_step2_plotDownload",
-                          label = "下载作图",
-                          style = "jelly",
-                          right = FALSE,
-                          up = FALSE,
-                          icon = icon("download"),
-                          status = "primary",
-                          size = "s",
-                          width = "130%",
-                          pickerInput(
-                            inputId = "groupCompare_g1_step2_plotDownload_unit",
-                            label = "选择宽度和高度单位",
-                            choices = c("cm","in","mm","px"),
-                            selected = "in"
-                          ),
-                          numericInputIcon(
-                            inputId = "groupCompare_g1_step2_plotDownload_width",
-                            label = "宽度",
-                            value = 10
-                          ),
-                          numericInputIcon(
-                            inputId = "groupCompare_g1_step2_plotDownload_ht",
-                            label = "高度",
-                            value = 8
-                          ),
-                          numericInputIcon(
-                            inputId = "groupCompare_g1_step2_plotDownload_dpi",
-                            label = "DPI",
-                            value = 300
-                          ),
-                          downloadBttn("groupCompare_g1_step2_plotDownload_png", label = "保存图片", size = "xs")
-                        )
-                      ),
-                      column(
-                        width = 12,
-                        plotOutput("groupCompare_g1_step2_plot")
-                      )
+                    column(
+                      width = 12,
+                      plotOutput("groupCompare_g1_step2_plot")
                     )
                   )
                 )
