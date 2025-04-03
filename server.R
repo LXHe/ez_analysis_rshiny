@@ -570,6 +570,10 @@ function(input, output, session) {
         awesomeCheckbox(
           inputId = "groupCompare_g1_step2_plotJitter",
           label = "散点抖动"
+        ),
+        awesomeCheckbox(
+          inputId = "groupCompare_g1_step2_plotOrientation",
+          label = "水平呈现"
         )
       )
     }
@@ -590,80 +594,55 @@ function(input, output, session) {
     input$groupCompare_g1_step2_plotRun,
     {
       req(compareGroup_g1_ds())
-      req(run_groupCompare_g1_step2_repeat1_test())
-      
-      if (input$groupCompare_g1_step2_plotTheme=="NULL"){grpVar <- "NULL"} 
-      else {grpVar <- input$groupCompare_g1_step2_tp}
-      
-      # Plot type specific adjustment
-      if (input$groupCompare_g1_step2_plotType=="boxplot"){
-        p <- plotType_func(
+      if (input$groupCompare_g1_step2_method=="单样本t检验"){
+        p <- plotTypeSingle_func(
           ds = compareGroup_g1_ds(), 
-          xVar = input$groupCompare_g1_step2_tp, 
           yVar = input$groupCompare_g1_step2_value, 
-          grpVar = grpVar, 
-          ytickNum = input$groupCompare_g1_step2_plotYtickNum,
-          plotType = input$groupCompare_g1_step2_plotType
-        )
-      } else {
-        p <- plotType_func(
-          ds = compareGroup_g1_ds(), 
-          xVar = input$groupCompare_g1_step2_tp, 
-          yVar = input$groupCompare_g1_step2_value, 
-          grpVar = grpVar, 
           ytickNum = input$groupCompare_g1_step2_plotYtickNum,
           plotType = input$groupCompare_g1_step2_plotType,
-          errorBar = input$groupCompare_g1_step2_plotError
-        ) 
+          errorBar = input$groupCompare_g1_step2_plotError,
+          orientation = input$groupCompare_g1_step2_plotOrientation
+        )
       }
+      else {
+        req(run_groupCompare_g1_step2_repeat1_test())
         
-      if (input$groupCompare_g1_step2_plotType=="boxplot"){
-        # Add jitter
-        if (input$groupCompare_g1_step2_plotJitter){
-          set.seed(21) # To obtain the same jitter
-          p <- p +
-            geom_jitter(
-              position = position_jitter(width = 0.3, height = 0.1), 
-              size = 3, alpha = 0.3, stroke = NA, show.legend = FALSE
+        if (input$groupCompare_g1_step2_plotTheme=="NULL"){grpVar <- "NULL"} 
+        else {grpVar <- input$groupCompare_g1_step2_tp}
+        
+        # Plot type specific adjustment
+        # if (input$groupCompare_g1_step2_plotType=="boxplot"){
+        #   p <- plotTypeMulti_func(
+        #     ds = compareGroup_g1_ds(), 
+        #     xVar = input$groupCompare_g1_step2_tp, 
+        #     yVar = input$groupCompare_g1_step2_value, 
+        #     grpVar = grpVar, 
+        #     ytickNum = input$groupCompare_g1_step2_plotYtickNum,
+        #     plotType = input$groupCompare_g1_step2_plotType
+        #   )
+        # } else {
+          p <- plotTypeMulti_func(
+            ds = compareGroup_g1_ds(), 
+            xVar = input$groupCompare_g1_step2_tp, 
+            yVar = input$groupCompare_g1_step2_value, 
+            grpVar = grpVar, 
+            ytickNum = input$groupCompare_g1_step2_plotYtickNum,
+            plotType = input$groupCompare_g1_step2_plotType,
+            errorBar = input$groupCompare_g1_step2_plotError,
+            orientation = input$groupCompare_g1_step2_plotOrientation
+          ) 
+        # }
+          
+        # Add significance
+        if (input$groupCompare_g1_step2_plotSignif!="NULL"){
+          p <- p + 
+            stat_pvalue_manual(
+              data = run_groupCompare_g1_step2_repeat1_test()[["sig_plot"]], 
+              label = paste0("{",input$groupCompare_g1_step2_plotSignif,"}"),
+              size = 4.8,
+              hide.ns = TRUE
             )
         }
-      }
-
-      # Add theme
-      if (input$groupCompare_g1_step2_plotTheme %in% c("Set1","Set2","Set3","Dark2","Paired")){
-        p <- p + 
-          scale_fill_brewer(palette = input$groupCompare_g1_step2_plotTheme) +
-          scale_color_brewer(palette = input$groupCompare_g1_step2_plotTheme)
-      } else if (input$groupCompare_g1_step2_plotTheme!="NULL"){
-        p <- p + 
-          eval(parse(text=paste0("scale_fill_",input$groupCompare_g1_step2_plotTheme,"()"))) +
-          eval(parse(text=paste0("scale_color_",input$groupCompare_g1_step2_plotTheme,"()")))
-      }
-
-      # Legend position
-      if (input$groupCompare_g1_step2_plotLegend=="legend_1"){
-        p <- p + theme(legend.position = c(0.01, 0.99), legend.justification = c(0,1))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_2"){
-        p <- p + theme(legend.position = c(0.01, 0.01), legend.justification = c(0,0))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_3"){
-        p <- p + theme(legend.position = c(0.99, 0.99), legend.justification = c(1,1))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_4"){
-        p <- p + theme(legend.position = c(0.99, 0.01), legend.justification = c(1,0))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_5"){
-        p <- p + theme(legend.position = c(0.01, 0.99), legend.justification = c(1,0))
-      } else {
-        p <- p + theme(legend.position=input$groupCompare_g1_step2_plotLegend)
-      }
-      
-      # Add significance
-      if (input$groupCompare_g1_step2_plotSignif!="NULL"){
-        p <- p + 
-          stat_pvalue_manual(
-            data = run_groupCompare_g1_step2_repeat1_test()[["sig_plot"]], 
-            label = paste0("{",input$groupCompare_g1_step2_plotSignif,"}"),
-            size = 4.8,
-            hide.ns = TRUE
-          )
       }
       
       p <- p + 
@@ -684,12 +663,50 @@ function(input, output, session) {
           axis.title = element_text(size=input$groupCompare_g1_step2_plotAxisFontSize)
         )
       
+      if (input$groupCompare_g1_step2_plotType=="boxplot"){
+        # Add jitter
+        if (input$groupCompare_g1_step2_plotJitter){
+          set.seed(21) # To obtain the same jitter
+          p <- p +
+            geom_jitter(
+              position = position_jitter(width = 0.3, height = 0.1), 
+              size = 3, alpha = 0.3, stroke = NA, show.legend = FALSE
+            )
+        }
+      }
+      
+      # Add theme
+      if (input$groupCompare_g1_step2_plotTheme %in% c("Set1","Set2","Set3","Dark2","Paired")){
+        p <- p + 
+          scale_fill_brewer(palette = input$groupCompare_g1_step2_plotTheme) +
+          scale_color_brewer(palette = input$groupCompare_g1_step2_plotTheme)
+      } else if (input$groupCompare_g1_step2_plotTheme!="NULL"){
+        p <- p + 
+          eval(parse(text=paste0("scale_fill_",input$groupCompare_g1_step2_plotTheme,"()"))) +
+          eval(parse(text=paste0("scale_color_",input$groupCompare_g1_step2_plotTheme,"()")))
+      }
+      
+      # Legend position
+      if (input$groupCompare_g1_step2_plotLegend=="legend_1"){
+        p <- p + theme(legend.position = c(0.01, 0.99), legend.justification = c(0,1))
+      } else if (input$groupCompare_g1_step2_plotLegend=="legend_2"){
+        p <- p + theme(legend.position = c(0.01, 0.01), legend.justification = c(0,0))
+      } else if (input$groupCompare_g1_step2_plotLegend=="legend_3"){
+        p <- p + theme(legend.position = c(0.99, 0.99), legend.justification = c(1,1))
+      } else if (input$groupCompare_g1_step2_plotLegend=="legend_4"){
+        p <- p + theme(legend.position = c(0.99, 0.01), legend.justification = c(1,0))
+      } else if (input$groupCompare_g1_step2_plotLegend=="legend_5"){
+        p <- p + theme(legend.position = c(0.01, 0.99), legend.justification = c(1,0))
+      } else {
+        p <- p + theme(legend.position=input$groupCompare_g1_step2_plotLegend)
+      }
+      
       return(p)
     }
   )
   
   output$groupCompare_g1_step2_plot <- renderPlot({run_groupCompare_g1_step2_plot()})
-  output$groupCompare_g1_step2_plotDownload_png <- downloadHandler(
+  output$groupCompare_g1_step2_plotDownload <- downloadHandler(
     filename = function(){
       paste("SingleGroupPlot", Sys.Date(), ".", input$groupCompare_g1_step2_plotDownload_format, sep = "")
     },
@@ -699,9 +716,7 @@ function(input, output, session) {
         input$groupCompare_g1_step2_plotDownload_format,
         png = list(device = "png"),
         jpeg = list(device = "jpeg", quality = input$groupCompare_g1_step2_plotDownload_quality),
-        pdf = list(device = cairo_pdf, paper = "A4"),
-        svg = list(device = "svg"),
-        list(device = "png") # default
+        pdf = list(device = cairo_pdf)
       )
       # Save the plot
       do.call(
@@ -713,7 +728,7 @@ function(input, output, session) {
             width = input$groupCompare_g1_step2_plotDownload_width,
             height = input$groupCompare_g1_step2_plotDownload_ht,
             units = input$groupCompare_g1_step2_plotDownload_unit,
-            limitsize=FALSE, # Allow large size
+            limitsize=FALSE # Allow large size
           ),
           params
         )

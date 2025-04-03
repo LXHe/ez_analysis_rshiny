@@ -5,9 +5,9 @@ library(htmlTable)
 library(PMCMRplus)
 library(readxl)
 library(rstatix)
-library(shiny)
-library(shinyBS)
-library(shinyjs)
+# library(shiny)
+# library(shinyBS)
+# library(shinyjs)
 library(showtext) # Chinese text presentation in plots
 library(tidyverse)
 library(plotly)
@@ -20,10 +20,8 @@ color_lvl_4 <- "#31a354" # Green for normality and normal status
 color_lvl_5 <- "#FF8C00" # Orange for choice selection and third variable level
 
 
-#############################
-###### General function #####
-#############################
-#### Importfile function ####
+#### General function ####
+##### Importfile function #####
 importFile_func <- function(inputFile){
   infile <- inputFile # Extract infile path
   req(infile) # infile path should be True
@@ -46,7 +44,7 @@ importFile_func <- function(inputFile){
   return(list(importFile,varName))
 }
 
-#### Dataframe format conversion ####
+##### Dataframe format conversion #####
 long2wide_func <- function(ds, namesFrom, valuesFrom, namesGlue=FALSE){
   if (namesGlue){
     ng <- paste0("cvt_{",namesFrom,"}")
@@ -73,10 +71,8 @@ wide2long_func <- function(ds, colsName){
 }
 
 
-##############################
 #### Tab:rawData Function ####
-##############################
-#### Normality test analysis function ####
+##### Normality test analysis function #####
 normTestAna_func <- function(ds, var, group){
   if (group == "(无)"){
     ds_nest <- ds %>%
@@ -110,7 +106,7 @@ normTestAna_func <- function(ds, var, group){
   return(normTest_ds)
 }
 
-#### Normality test report function ####
+##### Normality test report function #####
 normTestFeedback_func <- function(dsList, num_col, cat_col){
   if (cat_col != "(无)"){
     fb_num <- ""
@@ -169,10 +165,8 @@ normTestFeedback_func <- function(dsList, num_col, cat_col){
 }
 
 
-##############################
-##### Tab: groupCompare ######
-##############################
-#### Failed normality check feedback ####
+#### Tab: groupCompare ####
+##### Failed normality check feedback #####
 # For normality feedback after normTestAna_func()
 # There should be only one element as the group variable
 normTestFail_func <- function(ds, tp, group=NULL){
@@ -195,7 +189,7 @@ normTestFail_func <- function(ds, tp, group=NULL){
   }
 }
 
-#### Posthoc test feedback ####
+##### Posthoc test feedback #####
 posthoc_func <- function(ds, tp, group=NULL){
   if (is.null(group)){
     if (ds[["p.adj"]]<=0.05){
@@ -238,7 +232,7 @@ posthoc_func <- function(ds, tp, group=NULL){
   }
 }
 
-#### Friedman test feedback ####
+##### Friedman test feedback #####
 friedmanRlt_func <- function(ds, tp, group=NULL){
   if (is.null(group)){
     if (ds[["p"]]<=0.05){
@@ -273,7 +267,7 @@ friedmanRlt_func <- function(ds, tp, group=NULL){
   }
 }
 
-#### Friedman posthoc (Nemenyi test) feedback ####
+##### Friedman posthoc (Nemenyi test) feedback #####
 posthocFriedman_func <- function(prlt, tp){
   p.rownames <- dimnames(prlt)[[1]]
   p.colnames <- dimnames(prlt)[[2]]
@@ -306,7 +300,7 @@ posthocFriedman_func <- function(prlt, tp){
   return(p_feedback)
 }
 
-#### Friedman test group feedback ####
+##### Friedman test group feedback #####
 posthocFriedmanGroup_func <- function(ds, value, tp, group){
   if (ds[["p"]]<=0.05){
     test_posthocInter <- frdAllPairsNemenyiTest(
@@ -331,7 +325,7 @@ posthocFriedmanGroup_func <- function(ds, value, tp, group){
   return(feedback_list)
 }
 
-#### Concatenate feedback string vector into a single vector ####
+##### Concatenate feedback string vector into a single vector #####
 feedback_concat <- function(str_vec){
   feedback_string <- ""
   for (i in str_vec){
@@ -341,7 +335,7 @@ feedback_concat <- function(str_vec){
 }
 
 
-#### Single sample ttest ####
+##### Single sample ttest #####
 single_ttest_func <- function(ds, value, mu){
   
   # Get single ttest result
@@ -349,34 +343,41 @@ single_ttest_func <- function(ds, value, mu){
   
   # Evaluate p-value
   test_p <- test_rlt$p
-  if (test_p<=0.05){
+  if (test_p<=0.05 & test_rlt$statistic<=0){
     test_rpt <- paste0(
-      "单样本t检验显示，变量<font color=\"",color_lvl_1,"\"><b>", value,
-      "</b></font>的均值与<font color=\"",color_lvl_1,"\"><b>目标值</b></font>",mu,"相比<font color=\"",color_lvl_3,"\"><b>存在</b></font>显著差异（P=",
+      "单样本t检验结果显示，变量<font color=\"",color_lvl_1,"\"><b>", value,
+      "</b></font>的均值<font color=\"",color_lvl_3,"\"><b>显著低于</b></font><font color=\"",
+      color_lvl_1,"\"><b>目标值</b></font>",mu,
+      "（P=",
       signif(test_p,3),
       "）。"
     )
-  }
-  else {
+  } else if (test_p<=0.05 & test_rlt$statistic>0){
     test_rpt <- paste0(
-      "单样本t检验显示，变量<font color=\"",color_lvl_1,"\"><b>", value,
-      "</b></font>的均值与<font color=\"",color_lvl_1,"\"><b>目标值</b></font>",mu,"相比<font color=\"",color_lvl_4,"\"><b>不存在</b></font>显著差异（P=",
+      "单样本t检验结果显示，变量<font color=\"",color_lvl_1,"\"><b>", value,
+      "</b></font>的均值<font color=\"",color_lvl_3,"\"><b>显著高于</b></font><font color=\"",
+      color_lvl_1,"\"><b>目标值</b></font>",mu,
+      "（P=",
+      signif(test_p,3),
+      "）。"
+    )
+  } else {
+    test_rpt <- paste0(
+      "单样本t检验结果显示，变量<font color=\"",color_lvl_1,"\"><b>", value,
+      "</b></font>的均值与<font color=\"",color_lvl_1,"\"><b>目标值</b></font>",mu,
+      "相比<font color=\"",color_lvl_4,"\"><b>不存在</b></font>显著差异（P=",
       signif(test_p,3),
       "）。"
     )
   }
   
-  # Boxplot using ds[[value]]
-  sig_plot <- plot_ly(ds, y = ~!!sym(value), type = "box")
-  # sig_plot <- NULL
-  
-  rlt_list <- list(test_rpt, test_rlt, sig_plot)
-  names(rlt_list) <- c("test_report", "test_result", "sig_plot")
+  rlt_list <- list(test_rpt, test_rlt)
+  names(rlt_list) <- c("test_report", "test_result")
   return(rlt_list)
 }
 
 
-#### Paired ttest function ####
+##### Paired ttest function #####
 paired_ttest_func <- function(ds, tp, value){
   
   # Convert df from long to wide format for difference normality test
@@ -512,7 +513,7 @@ paired_ttest_func <- function(ds, tp, value){
   return(rlt_list)
 }
 
-#### repeated measures ANOVA ####
+##### Repeated measures ANOVA #####
 rep_anova_func <- function(ds, id, tp, value, group=NULL){
   # Normality check within groups
   if (is.null(group)){
@@ -894,8 +895,67 @@ rep_anova_func <- function(ds, id, tp, value, group=NULL){
   return(rlt_list) 
 }
 
-#### Plot type function ####
-plotType_func <- function(ds, xVar, yVar, grpVar, plotType, ytickNum, errorBar=NULL){
+##### Plot function with single group #####
+plotTypeSingle_func <- function(ds, yVar, ytickNum, plotType, errorBar=NULL, orientation=NULL){
+  if (plotType == "boxplot"){
+      p <- ggboxplot(
+        data=ds, y=yVar, outlier.shape=NA, 
+        bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
+        orientation=ifelse(orientation, "horizontal", "vertical")
+      )
+      p <- p +
+        scale_y_continuous(
+          n.breaks = ytickNum, 
+          expand = expansion(mult = c(0.05, 0.1))
+        )
+  } else if (plotType=="barplot"){
+    ds_summary <- ds %>% 
+      summarise(mean=mean(!!sym(yVar)), sd=sd(!!sym(yVar)))
+    
+    if (errorBar=="error_0"){
+      p <- ggbarplot(data=ds, y=yVar, add="mean") 
+    } else if (errorBar=="error_1"){ # Full errorbar
+      p <- ggbarplot(data=ds, y=yVar, add="mean_sd") 
+    } else if (errorBar=="error_2"){ # Half errorbar
+      p <- ggbarplot(data=ds, y=yVar, add="mean_sd", error.plot = "upper_errorbar") 
+    }
+    
+    # Set x-axis to 0 if the means are negative
+    if (any(ds_summary$mean<0)){
+      p <- p + geom_hline(yintercept=0) +
+        scale_y_continuous(
+          n.breaks = ytickNum, 
+          expand = expansion(mult = c(0.05, 0.1))
+        )
+    } else {
+      p <- p +
+        scale_y_continuous(
+          n.breaks = ytickNum, 
+          expand = expansion(mult = c(0, 0.1))
+        )
+    }
+  } else {
+      if (errorBar=="error_0"){
+        p <- ggline(data=ds, y=yVar, add="mean") 
+      } else if (errorBar=="error_1"){ # Full errorbar
+        p <- ggline(data=ds, y=yVar, add="mean_sd") 
+      } else if (errorBar=="error_2"){ # Half errorbar
+        p <- ggline(data=ds, y=yVar, add="mean_sd", error.plot = "upper_errorbar") 
+      }
+    
+      p <- p +
+        scale_y_continuous(
+          n.breaks = ytickNum, 
+          expand = expansion(mult = c(0.05, 0.1))
+        )
+  }
+  
+  p <- p + theme_bw()
+  return(p)
+}
+
+##### Plot function with multiple groups #####
+plotTypeMulti_func <- function(ds, xVar, yVar, grpVar, ytickNum, plotType, errorBar=NULL, orientation=NULL){
   
   if (is.character(ds[[xVar]])){ # Check if x is in the type of character
     
@@ -921,13 +981,15 @@ plotType_func <- function(ds, xVar, yVar, grpVar, plotType, ytickNum, errorBar=N
     if (grpVar=="NULL"){
       p <- ggboxplot(
         data=ds, x=xVar, y=yVar, outlier.shape=NA, 
-        bxp.errorbar=TRUE, bxp.errorbar.width=0.3
+        bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
+        orientation=ifelse(orientation, "horizontal", "vertical")
       ) 
     }
     else {
       p <- ggboxplot(
         data=ds, x=xVar, y=yVar, color=grpVar, 
-        outlier.shape=NA, bxp.errorbar=TRUE, bxp.errorbar.width=0.3
+        outlier.shape=NA, bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
+        orientation=ifelse(orientation, "horizontal", "vertical")
       ) 
     }
     
@@ -936,9 +998,7 @@ plotType_func <- function(ds, xVar, yVar, grpVar, plotType, ytickNum, errorBar=N
         n.breaks = ytickNum, 
         expand = expansion(mult = c(0.05, 0.1))
       )
-  }
-  
-  if (plotType=="barplot"){
+  } else if (plotType=="barplot"){
     if (grpVar=="NULL"){
       if (errorBar=="error_0"){
         p <- ggbarplot(data=ds, x=xVar, y=yVar, add="mean") 
@@ -972,9 +1032,7 @@ plotType_func <- function(ds, xVar, yVar, grpVar, plotType, ytickNum, errorBar=N
           expand = expansion(mult = c(0, 0.1))
         )
     }
-  }
-  
-  if (plotType == "lineplot"){
+  } else {
     if (grpVar=="NULL"){
       if (errorBar=="error_0"){
         p <- ggline(data=ds, x=xVar, y=yVar, add="mean") 

@@ -701,7 +701,7 @@ body <- dashboardBody(
                               pickerInput(
                                 inputId = "groupCompare_g1_step2_plotDownload_unit",
                                 label = "选择单位",
-                                choices = c("cm","in","mm","px"),
+                                choices = c("in","mm","px"),
                                 selected = "in"
                               ),
                               numericInputIcon(
@@ -722,7 +722,7 @@ body <- dashboardBody(
                               selectInput(
                                 "groupCompare_g1_step2_plotDownload_format", 
                                 "选择图片格式：",
-                                choices = c("PNG" = "png", "PDF" = "pdf", "JPEG" = "jpeg", "SVG" = "svg"),
+                                choices = c("PNG" = "png", "PDF" = "pdf", "JPEG" = "jpeg"),
                                 selected = "png"
                               ),
                               conditionalPanel(
@@ -732,7 +732,7 @@ body <- dashboardBody(
                                   "JPEG质量 (0-100):", 
                                   min = 1, max = 100, value = 90)
                                 ),
-                              downloadBttn("groupCompare_g1_step2_plotDownload_png", label = "保存图片", size = "xs")
+                              downloadBttn("groupCompare_g1_step2_plotDownload", label = "保存图片", size = "xs")
                             )
                           ),
                           column(
@@ -750,9 +750,11 @@ body <- dashboardBody(
 
                       )
                     ),
-                    column(
-                      width = 12,
-                      plotOutput("groupCompare_g1_step2_plot")
+                    fluidRow(
+                      column(
+                        width = 12,
+                        plotOutput("groupCompare_g1_step2_plot")
+                      )
                     )
                   )
                 )
