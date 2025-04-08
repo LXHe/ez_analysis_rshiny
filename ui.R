@@ -22,7 +22,7 @@ color_lvl_5 <- "#FF8C00" # Orange for choice selection and third variable level
 
 #### Header setting ####
 header <- dashboardHeader(
-  # title = "运动与健康大数据处理平台",
+  # title = "运动与健康数据分析平台",
   title = NULL,
   titleWidth = "22%" # width in percentage
 )
@@ -52,18 +52,18 @@ sidebar <- dashboardSidebar(
 #### Body setting ####
 body <- dashboardBody(
   
-  #### Change validation need message color ####
+  ##### Change validation need message color #####
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "index.css")
   ),
   
-  #### Activate shinyjs (library:shinyjs) ####
+  ##### Activate shinyjs (library:shinyjs) #####
   useShinyjs(),
   
-  #### Define busy indicator (library:shinybusy) ####
+  ##### Define busy indicator (library:shinybusy) #####
   add_busy_spinner(spin = "trinity-rings", color = "#3182bd", timeout = 1000),
   
-  #### Define hover message (library:shinyBS) ####
+  ##### Define hover message (library:shinyBS) #####
   bsTooltip(
     id = c(
       "rawData_step1_cfmRun","rawData_step2_cfmRun","rawData_step3_cfmRun",
@@ -80,15 +80,15 @@ body <- dashboardBody(
     title = "每次设置完毕后，请点击此按钮更新",
     placement = "top"
   ),
-  #### Activate circle hover message (library:promter) ####
+  ##### Activate circle hover message (library:promter) #####
   use_prompt(),
 
-  #### Main dashboard of Table ####
+  ##### Main dashboard of Table #####
   tabItems(
-    #### Tab:rawData ####
+    ###### Tab:rawData ######
     tabItem(
       tabName = "rawData",
-      #### Step 1 ####
+      ####### Step 1 #######
       shinydashboardPlus::box(
         style = "margin: 0px",
         title = "步骤1：数据导入与变量设置",
@@ -175,7 +175,7 @@ body <- dashboardBody(
         htmlOutput("rawData_step1_outFileInfo")
       ),
       
-      #### Step 2 ####
+      ####### Step 2 #######
       shinydashboardPlus::box(
         style = "margin: 0px",
         title = "步骤2：正态性检验（仅限于选择了连续变量的情况）",
@@ -284,7 +284,7 @@ body <- dashboardBody(
         )
       ),
       
-      #### Step 3 ####
+      ####### Step 3 #######
       shinydashboardPlus::box(
         style = "margin: 0px",
         title = "步骤3：描述性表格",
@@ -349,16 +349,16 @@ body <- dashboardBody(
       )
     ),
     
-    #### Tab:groupCompare ####
+    ###### Tab:groupCompare ######
     tabItem(
       tabName = "groupCompare",
       fluidRow(
         tabBox(
           width = 12,
-          #### Subtab: single group ####
+          ####### Subtab: single group #######
           tabPanel(
             title = "单组样本",
-            #### Step 1 ####
+            ######## Step 1 ########
             shinydashboardPlus::box(
               style = "margin: 0px",
               title = "步骤1：确定统计方法及数据格式",
@@ -379,10 +379,10 @@ body <- dashboardBody(
               HTML(
                 paste0(
                   "<p>
-                    此分析仅适用于<font color=\"",color_lvl_3,"\"><b>只有一个分组</b></font>的<font color=\"",color_lvl_3,"\"><b>连续变量</b></font>的数据。<br>
-                    <font color=\"",color_lvl_1,"\"><b>示例场景1</b></font>：对某大学某专业一个班的男同学进行了身高测量，现打算分析该班男同学的身高与全国男性的平均身高（1.7米）相比是否有差别。在<b>数据重复测试次数</b>一栏中选择<font color=\"",color_lvl_5,"\"><b>无重复测试</font></b>选项。<br>
-                    <font color=\"",color_lvl_1,"\"><b>示例场景2</b></font>：一批铅球运动员接受了3个月的力量训练，现打算分析力量训练前后他们的铅球成绩是否有差别。在<b>数据重复测试次数</b>一栏中选择<font color=\"",color_lvl_5,"\"><b>重复测试一次</font></b>选项。<br>
-                    <font color=\"",color_lvl_1,"\"><b>示例场景3</b></font>：在早、中、晚三个时间点测试一批短跑运动员的100米成绩，比较这三个时间点的成绩是否有差别。在<b>数据重复测试次数</b>一栏中选择<font color=\"",color_lvl_5,"\"><b>重复测试两次及以上</font></b>选项。
+                    此分析仅适用于<font color=\"",color_lvl_3,"\"><b>只有一个分组</b></font>的<font color=\"",color_lvl_3,"\"><b>连续型</b></font>数据。<br>
+                    <font color=\"",color_lvl_1,"\"><b>示例场景1</b></font>：对某大学某专业一个班的男同学进行了身高测量，现打算分析该班男同学的身高与全国男性的平均身高（1.7米）相比是否有差别。在<em><b>数据重复测试次数</b></em>选项中选择<font color=\"",color_lvl_5,"\"><b>无重复测试</font></b>选项。<br>
+                    <font color=\"",color_lvl_1,"\"><b>示例场景2</b></font>：一批铅球运动员接受了3个月的力量训练，现打算分析力量训练前后他们的铅球成绩是否有差别。在<em><b>数据重复测试次数</b></em>选项中选择<font color=\"",color_lvl_5,"\"><b>重复测试一次</font></b>选项。<br>
+                    <font color=\"",color_lvl_1,"\"><b>示例场景3</b></font>：在早、中、晚三个时间点测试一批短跑运动员的100米成绩，比较这三个时间点的成绩是否有差别。在<em><b>数据重复测试次数</b></em>选项中选择<font color=\"",color_lvl_5,"\"><b>重复测试两次及以上</font></b>选项。
                   </p>"
                 )
               ),
@@ -408,7 +408,7 @@ body <- dashboardBody(
               )
             ),
             
-            #### Step 2 ####
+            ######## Step 2 ########
             shinydashboardPlus::box(
               style = "margin: 0px",
               title = "步骤2：数据分析",
@@ -450,10 +450,11 @@ body <- dashboardBody(
                     inputId = "groupCompare_g1_step2_method",
                     label = "选择统计方法",
                     choices = c(
+                      "单样本t检验",
                       "配对检验",
                       "方差分析"
                     ),
-                    selected = "配对检验"
+                    selected = "单样本t检验"
                   )
                 ),
                 column(
@@ -479,12 +480,12 @@ body <- dashboardBody(
                     column(
                       width = 4,
                       pickerInput(
-                        inputId = "groupCompare_g1_step2_tp",
+                        inputId = "groupCompare_g1_step2_value",
                         label = tags$span(
-                          "选择测试时间点变量",
+                          "选择测试值变量",
                           tags$span(icon("exclamation-circle")) %>%
                             add_prompt(
-                              message = "对应示例中的Timepoint",
+                              message = "对应示例中的Value",
                               position = "right"
                             )
                         ),
@@ -495,7 +496,7 @@ body <- dashboardBody(
                     ),
                     column(
                       width = 4,
-                      uiOutput("groupCompare_g1_step2_valueUI")
+                      uiOutput("groupCompare_g1_step2_tpUI")
                     )
                   )
                 )
@@ -522,7 +523,7 @@ body <- dashboardBody(
                         width = 2,
                         pickerInput(
                           inputId = "groupCompare_g1_step2_plotType",
-                          label = "请选择图形类型",
+                          label = "请选择作图类型",
                           choices = c("箱式图"="boxplot","柱状图"="barplot","折线图"="lineplot"),
                           selected = "boxplot"
                         )
@@ -531,7 +532,7 @@ body <- dashboardBody(
                         width = 2,
                         pickerInput(
                           inputId = "groupCompare_g1_step2_plotTheme",
-                          label = "请选择图形风格",
+                          label = "请选择作图风格",
                           choices = c(
                             "无风格"="NULL", "风格1"="Set1", "风格2"="Set2", "浅色风格"="Set3",  "深色风格"="Dark2", "配对风格"="Paired",
                             "灰度风格"="grey","BMJ"="bmj", "Frontiers"="frontiers", "JAMA"="jama", "JCO"="jco",
@@ -544,194 +545,212 @@ body <- dashboardBody(
                         width = 2,
                         pickerInput(
                           inputId = "groupCompare_g1_step2_plotSignif",
-                          label = "显著性呈现",
+                          label = "显著性设置",
                           choices = c("不显示"="NULL","显示P值"="p.format","显示星号"="p.adj.signif"),
                           selected = "NULL"
                         )
                       ),
                       column(
                         width = 2,
-                        uiOutput("groupCompare_g1_step2_plotUI")
+                        uiOutput("groupCompare_g1_step2_plotSubUI")
                       ),
                       column(
-                        width = 2,
-                        dropdown(
-                          inputId = "groupCompare_g1_step2_plotConfig",
-                          label = "图形界面设置",
-                          style = "jelly",
-                          right = TRUE,
-                          icon = icon("gear"),
-                          status = "primary",
-                          size = "s",
-                          width = "400%",
-                          fluidRow(
-                            column(
-                              width = 4,
-                              textInput(
-                                inputId = "groupCompare_g1_step2_plotTitle",
-                                label = tags$span(
-                                  "设置图形标题",
-                                  tags$span(icon("exclamation-circle")) %>%
-                                    add_prompt(
-                                      message = "若不设定，则不用输入",
-                                      position = "right"
+                        width = 4,
+                        fluidRow(
+                          column(
+                            width = 4,
+                            dropdown(
+                              inputId = "groupCompare_g1_step2_plotConfig",
+                              label = "作图界面设置",
+                              style = "jelly",
+                              right = TRUE,
+                              icon = icon("gear"),
+                              status = "primary",
+                              size = "s",
+                              width = "400%",
+                              fluidRow(
+                                column(
+                                  width = 4,
+                                  textInput(
+                                    inputId = "groupCompare_g1_step2_plotTitle",
+                                    label = tags$span(
+                                      "设置作图标题",
+                                      tags$span(icon("exclamation-circle")) %>%
+                                        add_prompt(
+                                          message = "若不设定，则不用输入",
+                                          position = "right"
+                                        )
                                     )
+                                  )
+                                ),
+                                column(
+                                  width = 4,
+                                  pickerInput(
+                                    inputId = "groupCompare_g1_step2_plotTitlePosition",
+                                    label = "设置标题位置",
+                                    choices = c("居左"=0,"居中"=0.5,"居右"=1),
+                                    selected = 0.5
+                                  )
+                                ),
+                                column(
+                                  width = 4,
+                                  sliderInput(
+                                    inputId = "groupCompare_g1_step2_plotTitleFontSize",
+                                    label = "调节标题字体大小",
+                                    min = 5,
+                                    max = 25,
+                                    value = 15,
+                                    step = 1
+                                  )
+                                )
+                              ),
+                              fluidRow(
+                                column(
+                                  width = 6,
+                                  textInput(
+                                    inputId = "groupCompare_g1_step2_plotXlabel",
+                                    label = tags$span(
+                                      "设置X轴名称",
+                                      tags$span(icon("exclamation-circle")) %>%
+                                        add_prompt(
+                                          message = "若不设定，则不用输入",
+                                          position = "right"
+                                        )
+                                    )
+                                  )
+                                ),
+                                column(
+                                  width = 6,
+                                  textInput(
+                                    inputId = "groupCompare_g1_step2_plotYlabel",
+                                    label = tags$span(
+                                      "设置Y轴名称",
+                                      tags$span(icon("exclamation-circle")) %>%
+                                        add_prompt(
+                                          message = "若不设定，则不用输入",
+                                          position = "right"
+                                        )
+                                    )
+                                  )
+                                )
+                              ),
+                              fluidRow(
+                                column(
+                                  width = 6,
+                                  sliderInput(
+                                    inputId = "groupCompare_g1_step2_plotYtickNum",
+                                    label = "设置Y轴标尺数目",
+                                    min = 3,
+                                    max = 10,
+                                    value = 5,
+                                    step = 1
+                                  )
+                                ),
+                                column(
+                                  width = 6,
+                                  sliderInput(
+                                    inputId = "groupCompare_g1_step2_plotAxisFontSize",
+                                    label = "调节坐标轴字体大小",
+                                    min = 5,
+                                    max = 25,
+                                    value = 10,
+                                    step = 1
+                                  )
+                                )
+                              ),
+                              fluidRow(
+                                column(
+                                  width = 6,
+                                  pickerInput(
+                                    inputId = "groupCompare_g1_step2_plotLegend",
+                                    label = "图例呈现",
+                                    choices = c(
+                                      "不显示"="none","图中左上角"="legend_1","图中左下角"="legend_2","图中右上角"="legend_3","图中右下角"="legend_4",
+                                      "图外左侧"="left","图外上方"="top","图外右侧"="right","图外下方"="bottom"
+                                    )
+                                  )
+                                ),
+                                column(
+                                  width = 6,
+                                  textInput(
+                                    inputId = "groupCompare_g1_step2_plotLegendLabel",
+                                    label = tags$span(
+                                      "设置图例标题",
+                                      tags$span(icon("exclamation-circle")) %>%
+                                        add_prompt(
+                                          message = "若不设定，则不用输入",
+                                          position = "right"
+                                        )
+                                    )
+                                  )
                                 )
                               )
-                            ),
-                            column(
-                              width = 4,
+                            )
+                          ),
+                          column(
+                            width = 4,
+                            dropdown(
+                              inputId = "groupCompare_g1_step2_plotDownload2",
+                              label = "下载作图",
+                              style = "jelly",
+                              right = TRUE,
+                              icon = icon("download"),
+                              status = "primary",
+                              size = "s",
+                              width = "130%",
                               pickerInput(
-                                inputId = "groupCompare_g1_step2_plotTitlePosition",
-                                label = "设置标题位置",
-                                choices = c("居左"=0,"居中"=0.5,"居右"=1),
-                                selected = 0.5
-                              )
-                            ),
-                            column(
-                              width = 4,
-                              sliderInput(
-                                inputId = "groupCompare_g1_step2_plotTitleFontSize",
-                                label = "调节标题字体大小",
-                                min = 5,
-                                max = 25,
-                                value = 15,
-                                step = 1
-                              )
+                                inputId = "groupCompare_g1_step2_plotDownload_unit",
+                                label = "选择单位",
+                                choices = c("in","mm","px"),
+                                selected = "in"
+                              ),
+                              numericInputIcon(
+                                inputId = "groupCompare_g1_step2_plotDownload_width",
+                                label = "宽度",
+                                value = 10
+                              ),
+                              numericInputIcon(
+                                inputId = "groupCompare_g1_step2_plotDownload_ht",
+                                label = "高度",
+                                value = 8
+                              ),
+                              numericInputIcon(
+                                inputId = "groupCompare_g1_step2_plotDownload_dpi",
+                                label = "DPI",
+                                value = 300
+                              ),
+                              selectInput(
+                                "groupCompare_g1_step2_plotDownload_format", 
+                                "选择图片格式：",
+                                choices = c("PNG" = "png", "PDF" = "pdf", "JPEG" = "jpeg"),
+                                selected = "png"
+                              ),
+                              conditionalPanel(
+                                condition = "input.groupCompare_g1_step2_plotDownload_format == 'jpeg'",
+                                sliderInput(
+                                  "groupCompare_g1_step2_plotDownload_quality", 
+                                  "JPEG质量 (0-100):", 
+                                  min = 1, max = 100, value = 90)
+                                ),
+                              downloadBttn("groupCompare_g1_step2_plotDownload", label = "保存图片", size = "xs")
                             )
                           ),
-                          fluidRow(
-                            column(
-                              width = 6,
-                              textInput(
-                                inputId = "groupCompare_g1_step2_plotXlabel",
-                                label = tags$span(
-                                  "设置X轴名称",
-                                  tags$span(icon("exclamation-circle")) %>%
-                                    add_prompt(
-                                      message = "若不设定，则不用输入",
-                                      position = "right"
-                                    )
-                                )
-                              )
-                            ),
-                            column(
-                              width = 6,
-                              textInput(
-                                inputId = "groupCompare_g1_step2_plotYlabel",
-                                label = tags$span(
-                                  "设置Y轴名称",
-                                  tags$span(icon("exclamation-circle")) %>%
-                                    add_prompt(
-                                      message = "若不设定，则不用输入",
-                                      position = "right"
-                                    )
-                                )
-                              )
-                            )
-                          ),
-                          fluidRow(
-                            column(
-                              width = 6,
-                              sliderInput(
-                                inputId = "groupCompare_g1_step2_plotYtickNum",
-                                label = "设置Y轴标尺数目",
-                                min = 3,
-                                max = 10,
-                                value = 5,
-                                step = 1
-                              )
-                            ),
-                            column(
-                              width = 6,
-                              sliderInput(
-                                inputId = "groupCompare_g1_step2_plotAxisFontSize",
-                                label = "调节坐标轴字体大小",
-                                min = 5,
-                                max = 25,
-                                value = 10,
-                                step = 1
-                              )
-                            )
-                          ),
-                          fluidRow(
-                            column(
-                              width = 6,
-                              pickerInput(
-                                inputId = "groupCompare_g1_step2_plotLegend",
-                                label = "图例呈现",
-                                choices = c(
-                                  "不显示"="none","图中左上角"="legend_1","图中左下角"="legend_2","图中右上角"="legend_3","图中右下角"="legend_4",
-                                  "图外左侧"="left","图外上方"="top","图外右侧"="right","图外下方"="bottom"
-                                )
-                              )
-                            ),
-                            column(
-                              width = 6,
-                              textInput(
-                                inputId = "groupCompare_g1_step2_plotLegendLabel",
-                                label = tags$span(
-                                  "设置图例标题",
-                                  tags$span(icon("exclamation-circle")) %>%
-                                    add_prompt(
-                                      message = "若不设定，则不用输入",
-                                      position = "right"
-                                    )
-                                )
-                              )
+                          column(
+                            width = 4,
+                            actionBttn(
+                              inputId = "groupCompare_g1_step2_plotRun",
+                              label = "开始作图",
+                              style = "jelly",
+                              size = "s",
+                              color = "primary",
+                              icon = icon("play")
                             )
                           )
                         )
-                      ),
-                      column(
-                        width = 2,
-                        actionBttn(
-                          inputId = "groupCompare_g1_step2_plotRun",
-                          label = "开始作图",
-                          style = "jelly",
-                          size = "s",
-                          color = "primary",
-                          icon = icon("play")
-                        )
+
                       )
                     ),
                     fluidRow(
-                      column(
-                        width = 2,
-                        dropdown(
-                          inputId = "groupCompare_g1_step2_plotDownload",
-                          label = "下载图形",
-                          style = "jelly",
-                          right = FALSE,
-                          up = FALSE,
-                          icon = icon("download"),
-                          status = "primary",
-                          size = "s",
-                          width = "130%",
-                          pickerInput(
-                            inputId = "groupCompare_g1_step2_plotDownload_unit",
-                            label = "选择宽度和高度单位",
-                            choices = c("cm","in","mm","px"),
-                            selected = "in"
-                          ),
-                          numericInputIcon(
-                            inputId = "groupCompare_g1_step2_plotDownload_width",
-                            label = "宽度",
-                            value = 10
-                          ),
-                          numericInputIcon(
-                            inputId = "groupCompare_g1_step2_plotDownload_ht",
-                            label = "高度",
-                            value = 8
-                          ),
-                          numericInputIcon(
-                            inputId = "groupCompare_g1_step2_plotDownload_dpi",
-                            label = "DPI",
-                            value = 300
-                          ),
-                          downloadBttn("groupCompare_g1_step2_plotDownload_png", label = "保存图片", size = "xs")
-                        )
-                      ),
                       column(
                         width = 12,
                         plotOutput("groupCompare_g1_step2_plot")
@@ -743,10 +762,10 @@ body <- dashboardBody(
             )
           ),
           
-          #### Subtab: two groups ####
+          ####### Subtab: two groups #######
           tabPanel(
             title = "两组样本",
-            #### Step 1 ####
+            ######## Step 1 ########
             shinydashboardPlus::box(
               style = "margin: 0px",
               title = "步骤1：确定统计方法及数据格式",
@@ -782,7 +801,7 @@ body <- dashboardBody(
               )
             ),
             
-            #### Step 2 ####
+            ######## Step 2 ########
             shinydashboardPlus::box(
               style = "margin: 0px",
               title = "步骤2：数据导入与变量设置",
@@ -822,7 +841,7 @@ body <- dashboardBody(
             )
           ),
           
-          #### Subtab: three and above groups ####
+          ####### Subtab: three and above groups #######
           tabPanel(
             title = "三组及以上样本"
           )
@@ -830,15 +849,15 @@ body <- dashboardBody(
       )
     ),
     
-    #### Tab:regAnalysis ####
+    ###### Tab:regAnalysis ######
     tabItem(
       tabName = "regAnalysis"
     ),
     
-    #### Tab:dataProcess ####
+    ###### Tab:dataProcess ######
     tabItem(
       tabName = "dataProcess",
-      #### Customise missing value ####
+      ####### Customise missing value #######
       shinydashboardPlus::box(
         style = "margin: 0px",
         title = "自定义缺失值",
@@ -924,7 +943,7 @@ body <- dashboardBody(
         )
       ),
     
-      #### Dataset format conversion ####
+      ####### Dataset format conversion #######
       shinydashboardPlus::box(
         style = "margin: 0px",
         title = markdown("数据格式转换：长数据&harr;宽数据"),
@@ -1051,7 +1070,7 @@ body <- dashboardBody(
       )
     ),
     
-    #### Tab:about ####
+    ###### Tab:about ######
     tabItem(
       tabName = "about"
     )
