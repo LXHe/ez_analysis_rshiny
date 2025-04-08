@@ -978,20 +978,32 @@ plotTypeMulti_func <- function(ds, xVar, yVar, grpVar, ytickNum, plotType, error
   }
   
   if (plotType == "boxplot"){
-    if (grpVar=="NULL"){
-      p <- ggboxplot(
-        data=ds, x=xVar, y=yVar, outlier.shape=NA, 
-        bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
-        orientation=ifelse(orientation, "horizontal", "vertical")
-      ) 
+    boxplot_args <- list(
+      data=ds, x=xVar, y=yVar, outlier.shape=NA, 
+      bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
+      orientation=ifelse(orientation, "horizontal", "vertical")
+    )
+    if (grpVar!="NULL"){
+      boxplot_args$color <- grpVar
     }
-    else {
-      p <- ggboxplot(
-        data=ds, x=xVar, y=yVar, color=grpVar, 
-        outlier.shape=NA, bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
-        orientation=ifelse(orientation, "horizontal", "vertical")
-      ) 
-    }
+    p <- do.call(
+      ggboxplot,
+      boxplot_args
+    )
+    # if (grpVar=="NULL"){
+    #   p <- ggboxplot(
+    #     data=ds, x=xVar, y=yVar, outlier.shape=NA, 
+    #     bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
+    #     orientation=ifelse(orientation, "horizontal", "vertical")
+    #   ) 
+    # }
+    # else {
+    #   p <- ggboxplot(
+    #     data=ds, x=xVar, y=yVar, color=grpVar, 
+    #     outlier.shape=NA, bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
+    #     orientation=ifelse(orientation, "horizontal", "vertical")
+    #   ) 
+    # }
     
     p <- p +
       scale_y_continuous(

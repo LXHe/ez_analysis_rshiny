@@ -533,23 +533,26 @@ function(input, output, session) {
     }
   )
   
-  run_groupCompare_g1_step2_repeat1_test <- reactive({
-    if (input$groupCompare_g1_step2_method=="单样本t检验"){
-      ana_rlt <- single_ttest_func(
-        ds = compareGroup_g1_ds(),
-        value = input$groupCompare_g1_step2_value,
-        mu = input$groupCompare_g1_step2_mu
-      )
+  run_groupCompare_g1_step2_repeat1_test <- eventReactive(
+    input$groupCompare_g1_step2_cfmRun,
+    {
+      if (input$groupCompare_g1_step2_method=="单样本t检验"){
+        ana_rlt <- single_ttest_func(
+          ds = compareGroup_g1_ds(),
+          value = input$groupCompare_g1_step2_value,
+          mu = input$groupCompare_g1_step2_mu
+        )
+      }
+      else if(input$groupCompare_g1_step2_method=="配对检验"){
+        ana_rlt <- paired_ttest_func(
+          ds = compareGroup_g1_ds(),
+          tp = input$groupCompare_g1_step2_tp,
+          value = input$groupCompare_g1_step2_value
+        )
+      }
+      return(ana_rlt)
     }
-    else if(input$groupCompare_g1_step2_method=="配对检验"){
-      ana_rlt <- paired_ttest_func(
-        ds = compareGroup_g1_ds(),
-        tp = input$groupCompare_g1_step2_tp,
-        value = input$groupCompare_g1_step2_value
-      )
-    }
-    return(ana_rlt)
-  })
+  )
   
   ####### groupCompare_g1_step2_rpt #######
   output$groupCompare_g1_step2_rpt <- renderText({
@@ -610,28 +613,16 @@ function(input, output, session) {
         if (input$groupCompare_g1_step2_plotTheme=="NULL"){grpVar <- "NULL"} 
         else {grpVar <- input$groupCompare_g1_step2_tp}
         
-        # Plot type specific adjustment
-        # if (input$groupCompare_g1_step2_plotType=="boxplot"){
-        #   p <- plotTypeMulti_func(
-        #     ds = compareGroup_g1_ds(), 
-        #     xVar = input$groupCompare_g1_step2_tp, 
-        #     yVar = input$groupCompare_g1_step2_value, 
-        #     grpVar = grpVar, 
-        #     ytickNum = input$groupCompare_g1_step2_plotYtickNum,
-        #     plotType = input$groupCompare_g1_step2_plotType
-        #   )
-        # } else {
-          p <- plotTypeMulti_func(
-            ds = compareGroup_g1_ds(), 
-            xVar = input$groupCompare_g1_step2_tp, 
-            yVar = input$groupCompare_g1_step2_value, 
-            grpVar = grpVar, 
-            ytickNum = input$groupCompare_g1_step2_plotYtickNum,
-            plotType = input$groupCompare_g1_step2_plotType,
-            errorBar = input$groupCompare_g1_step2_plotError,
-            orientation = input$groupCompare_g1_step2_plotOrientation
-          ) 
-        # }
+        p <- plotTypeMulti_func(
+          ds = compareGroup_g1_ds(), 
+          xVar = input$groupCompare_g1_step2_tp, 
+          yVar = input$groupCompare_g1_step2_value, 
+          grpVar = grpVar, 
+          ytickNum = input$groupCompare_g1_step2_plotYtickNum,
+          plotType = input$groupCompare_g1_step2_plotType,
+          errorBar = input$groupCompare_g1_step2_plotError,
+          orientation = input$groupCompare_g1_step2_plotOrientation
+        ) 
           
         # Add significance
         if (input$groupCompare_g1_step2_plotSignif!="NULL"){
