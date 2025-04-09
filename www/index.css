@@ -9,3 +9,27 @@
 #rawData_normTestRlt {
     font-size: 12px;overflow-y: scroll; max-height: 250px; background: ghostwhite;
 }
+
+/* Plot action-button auto-adjustment */
+.dynamic-bttn {
+    font-size: 0.5vw !important;  /* 字体随视口宽度变化 */
+    padding: 1vw 2vw !important;  /* 内边距随视口宽度变化 */
+    min-width: 10vw !important;   /* 最小宽度防止过小 */
+    transition: all 0.3s ease;    /* 添加平滑过渡效果 */
+}
+
+/* Mobile fitting */
+@media (max-width: 768px) {
+    .dynamic-bttn {
+        font-size: 2.5vw !important;
+        padding: 1.5vw 3vw !important;
+    }
+}
+
+/* Container layout */
+.dynamic-bttn-container {
+    width: 95%;
+    max-width: 300px;
+    min-width: 150px;
+    margin: 10px auto;  /* Display in the middle */
+}

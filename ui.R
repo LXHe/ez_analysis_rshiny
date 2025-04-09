@@ -559,128 +559,147 @@ body <- dashboardBody(
                         fluidRow(
                           column(
                             width = 4,
-                            dropdown(
-                              inputId = "groupCompare_g1_step2_plotConfig",
-                              label = "作图界面设置",
-                              style = "jelly",
-                              right = TRUE,
-                              icon = icon("gear"),
-                              status = "primary",
-                              size = "s",
-                              width = "400%",
-                              fluidRow(
-                                column(
-                                  width = 4,
-                                  textInput(
-                                    inputId = "groupCompare_g1_step2_plotTitle",
-                                    label = tags$span(
-                                      "设置作图标题",
-                                      tags$span(icon("exclamation-circle")) %>%
-                                        add_prompt(
-                                          message = "若不设定，则不用输入",
-                                          position = "right"
-                                        )
+                            class = "dynamic-bttn-container", # For dynamic-bttn container layout
+                            div(
+                              dropdown(
+                                inputId = "groupCompare_g1_step2_plotConfig",
+                                label = "界面设置",
+                                style = "jelly",
+                                right = TRUE,
+                                icon = icon("gear"),
+                                status = "primary",
+                                size = "md",
+                                width = "500%",
+                                class = "dynamic-bttn", # For dynamic-bttn class
+                                fluidRow(
+                                  column(
+                                    width = 4,
+                                    textInput(
+                                      inputId = "groupCompare_g1_step2_plotTitle",
+                                      label = tags$span(
+                                        "标题名称",
+                                        tags$span(icon("exclamation-circle")) %>%
+                                          add_prompt(
+                                            message = "若不设定，则不用输入",
+                                            position = "right"
+                                          )
+                                      )
+                                    )
+                                  ),
+                                  column(
+                                    width = 4,
+                                    pickerInput(
+                                      inputId = "groupCompare_g1_step2_plotTitlePosition",
+                                      label = "标题位置",
+                                      choices = c("居左"=0,"居中"=0.5,"居右"=1),
+                                      selected = 0.5
+                                    )
+                                  ),
+                                  column(
+                                    width = 4,
+                                    numericInputIcon(
+                                      inputId = "groupCompare_g1_step2_plotTitleFontSize",
+                                      label = "标题字号",
+                                      value = 10
                                     )
                                   )
                                 ),
-                                column(
-                                  width = 4,
-                                  pickerInput(
-                                    inputId = "groupCompare_g1_step2_plotTitlePosition",
-                                    label = "设置标题位置",
-                                    choices = c("居左"=0,"居中"=0.5,"居右"=1),
-                                    selected = 0.5
-                                  )
-                                ),
-                                column(
-                                  width = 4,
-                                  sliderInput(
-                                    inputId = "groupCompare_g1_step2_plotTitleFontSize",
-                                    label = "调节标题字体大小",
-                                    min = 5,
-                                    max = 25,
-                                    value = 15,
-                                    step = 1
-                                  )
-                                )
-                              ),
-                              fluidRow(
-                                column(
-                                  width = 6,
-                                  textInput(
-                                    inputId = "groupCompare_g1_step2_plotXlabel",
-                                    label = tags$span(
-                                      "设置X轴名称",
-                                      tags$span(icon("exclamation-circle")) %>%
-                                        add_prompt(
-                                          message = "若不设定，则不用输入",
-                                          position = "right"
-                                        )
+                                fluidRow(
+                                  column(
+                                    width = 4,
+                                    textInput(
+                                      inputId = "groupCompare_g1_step2_plotXlabel",
+                                      label = tags$span(
+                                        "X轴标签名称",
+                                        tags$span(icon("exclamation-circle")) %>%
+                                          add_prompt(
+                                            message = "若不设定，则不用输入",
+                                            position = "right"
+                                          )
+                                      )
+                                    )
+                                  ),
+                                  column(
+                                    width = 4,
+                                    numericInputIcon(
+                                      inputId = "groupCompare_g1_step2_plotXlabelFontSize",
+                                      label = "X轴标签字号",
+                                      value = 12
+                                    )
+                                  ),
+                                  column(
+                                    width = 4,
+                                    numericInputIcon(
+                                      inputId = "groupCompare_g1_step2_plotXtickFontSize",
+                                      label = "X轴标尺字号",
+                                      value = 10
                                     )
                                   )
                                 ),
-                                column(
-                                  width = 6,
-                                  textInput(
-                                    inputId = "groupCompare_g1_step2_plotYlabel",
-                                    label = tags$span(
-                                      "设置Y轴名称",
-                                      tags$span(icon("exclamation-circle")) %>%
-                                        add_prompt(
-                                          message = "若不设定，则不用输入",
-                                          position = "right"
-                                        )
+                                fluidRow(
+                                  column(
+                                    width = 3,
+                                    textInput(
+                                      inputId = "groupCompare_g1_step2_plotYlabel",
+                                      label = tags$span(
+                                        "Y轴名称",
+                                        tags$span(icon("exclamation-circle")) %>%
+                                          add_prompt(
+                                            message = "若不设定，则不用输入",
+                                            position = "right"
+                                          )
+                                      )
                                     )
-                                  )
-                                )
-                              ),
-                              fluidRow(
-                                column(
-                                  width = 6,
-                                  sliderInput(
-                                    inputId = "groupCompare_g1_step2_plotYtickNum",
-                                    label = "设置Y轴标尺数目",
-                                    min = 3,
-                                    max = 10,
-                                    value = 5,
-                                    step = 1
-                                  )
-                                ),
-                                column(
-                                  width = 6,
-                                  sliderInput(
-                                    inputId = "groupCompare_g1_step2_plotAxisFontSize",
-                                    label = "调节坐标轴字体大小",
-                                    min = 5,
-                                    max = 25,
-                                    value = 10,
-                                    step = 1
-                                  )
-                                )
-                              ),
-                              fluidRow(
-                                column(
-                                  width = 6,
-                                  pickerInput(
-                                    inputId = "groupCompare_g1_step2_plotLegend",
-                                    label = "图例呈现",
-                                    choices = c(
-                                      "不显示"="none","图中左上角"="legend_1","图中左下角"="legend_2","图中右上角"="legend_3","图中右下角"="legend_4",
-                                      "图外左侧"="left","图外上方"="top","图外右侧"="right","图外下方"="bottom"
+                                  ),
+                                  column(
+                                    width = 3,
+                                    numericInputIcon(
+                                      inputId = "groupCompare_g1_step2_plotYtickNum",
+                                      label = "Y轴标尺数",
+                                      value = 5
                                     )
-                                  )
+                                  ),
+                                  column(
+                                    width = 3,
+                                    numericInputIcon(
+                                      inputId = "groupCompare_g1_step2_plotYlabelFontSize",
+                                      label = "Y轴标签字号",
+                                      value = 12
+                                    )
+                                  ),
+                                  column(
+                                    width = 3,
+                                    numericInputIcon(
+                                      inputId = "groupCompare_g1_step2_plotYtickFontSize",
+                                      label = "Y轴标尺字号",
+                                      value = 10
+                                    )
+                                  )  
                                 ),
-                                column(
-                                  width = 6,
-                                  textInput(
-                                    inputId = "groupCompare_g1_step2_plotLegendLabel",
-                                    label = tags$span(
-                                      "设置图例标题",
-                                      tags$span(icon("exclamation-circle")) %>%
-                                        add_prompt(
-                                          message = "若不设定，则不用输入",
-                                          position = "right"
-                                        )
+                                fluidRow(
+                                  column(
+                                    width = 6,
+                                    textInput(
+                                      inputId = "groupCompare_g1_step2_plotLegendLabel",
+                                      label = tags$span(
+                                        "设置图例标题",
+                                        tags$span(icon("exclamation-circle")) %>%
+                                          add_prompt(
+                                            message = "若不设定，则不用输入",
+                                            position = "right"
+                                          )
+                                      )
+                                    )
+                                  ),
+                                  column(
+                                    width = 6,
+                                    pickerInput(
+                                      inputId = "groupCompare_g1_step2_plotLegendPosition",
+                                      label = "设置图例位置",
+                                      choices = c(
+                                        "不显示"="none","图中左上角"="legend_1","图中左下角"="legend_2","图中右上角"="legend_3","图中右下角"="legend_4",
+                                        "图外左侧"="left","图外上方"="top","图外右侧"="right","图外下方"="bottom"
+                                      )
                                     )
                                   )
                                 )
@@ -689,65 +708,72 @@ body <- dashboardBody(
                           ),
                           column(
                             width = 4,
-                            dropdown(
-                              inputId = "groupCompare_g1_step2_plotDownload2",
-                              label = "下载作图",
-                              style = "jelly",
-                              right = TRUE,
-                              icon = icon("download"),
-                              status = "primary",
-                              size = "s",
-                              width = "130%",
-                              pickerInput(
-                                inputId = "groupCompare_g1_step2_plotDownload_unit",
-                                label = "选择单位",
-                                choices = c("in","mm","px"),
-                                selected = "in"
-                              ),
-                              numericInputIcon(
-                                inputId = "groupCompare_g1_step2_plotDownload_width",
-                                label = "宽度",
-                                value = 10
-                              ),
-                              numericInputIcon(
-                                inputId = "groupCompare_g1_step2_plotDownload_ht",
-                                label = "高度",
-                                value = 8
-                              ),
-                              numericInputIcon(
-                                inputId = "groupCompare_g1_step2_plotDownload_dpi",
-                                label = "DPI",
-                                value = 300
-                              ),
-                              selectInput(
-                                "groupCompare_g1_step2_plotDownload_format", 
-                                "选择图片格式：",
-                                choices = c("PNG" = "png", "PDF" = "pdf", "JPEG" = "jpeg"),
-                                selected = "png"
-                              ),
-                              conditionalPanel(
-                                condition = "input.groupCompare_g1_step2_plotDownload_format == 'jpeg'",
-                                sliderInput(
-                                  "groupCompare_g1_step2_plotDownload_quality", 
-                                  "JPEG质量 (0-100):", 
-                                  min = 1, max = 100, value = 90)
+                            class = "dynamic-bttn-container", # For dynamic-bttn container layout
+                            div(
+                              dropdown(
+                                inputId = "groupCompare_g1_step2_plotDownload2",
+                                label = "下载作图",
+                                style = "jelly",
+                                right = TRUE,
+                                icon = icon("download"),
+                                status = "primary",
+                                size = "md",
+                                width = "140%",
+                                class = "dynamic-bttn", # For dynamic-bttn class
+                                pickerInput(
+                                  inputId = "groupCompare_g1_step2_plotDownload_unit",
+                                  label = "选择单位",
+                                  choices = c("in","mm","px"),
+                                  selected = "in"
                                 ),
-                              downloadBttn("groupCompare_g1_step2_plotDownload", label = "保存图片", size = "xs")
+                                numericInputIcon(
+                                  inputId = "groupCompare_g1_step2_plotDownload_width",
+                                  label = "宽度",
+                                  value = 10
+                                ),
+                                numericInputIcon(
+                                  inputId = "groupCompare_g1_step2_plotDownload_ht",
+                                  label = "高度",
+                                  value = 8
+                                ),
+                                numericInputIcon(
+                                  inputId = "groupCompare_g1_step2_plotDownload_dpi",
+                                  label = "DPI",
+                                  value = 300
+                                ),
+                                selectInput(
+                                  "groupCompare_g1_step2_plotDownload_format", 
+                                  "选择图片格式：",
+                                  choices = c("PNG" = "png", "PDF" = "pdf", "JPEG" = "jpeg"),
+                                  selected = "png"
+                                ),
+                                conditionalPanel(
+                                  condition = "input.groupCompare_g1_step2_plotDownload_format == 'jpeg'",
+                                  sliderInput(
+                                    "groupCompare_g1_step2_plotDownload_quality", 
+                                    "JPEG质量 (0-100):", 
+                                    min = 1, max = 100, value = 90)
+                                ),
+                                downloadBttn("groupCompare_g1_step2_plotDownload", label = "保存图片", size = "xs")
+                              )
                             )
                           ),
                           column(
                             width = 4,
-                            actionBttn(
-                              inputId = "groupCompare_g1_step2_plotRun",
-                              label = "开始作图",
-                              style = "jelly",
-                              size = "s",
-                              color = "primary",
-                              icon = icon("play")
+                            div(
+                              class = "dynamic-bttn-container", # For dynamic-bttn container layout
+                              actionBttn(
+                                inputId = "groupCompare_g1_step2_plotRun",
+                                label = "开始作图",
+                                style = "jelly",
+                                size = "md",
+                                color = "primary",
+                                icon = icon("play"),
+                                class = "dynamic-bttn", # For dynamic-bttn class
+                              )
                             )
                           )
                         )
-
                       )
                     ),
                     fluidRow(

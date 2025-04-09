@@ -678,18 +678,18 @@ function(input, output, session) {
       }
       
       # Legend position
-      if (input$groupCompare_g1_step2_plotLegend=="legend_1"){
+      if (input$groupCompare_g1_step2_plotLegendPosition=="legend_1"){
         p <- p + theme(legend.position = c(0.01, 0.99), legend.justification = c(0,1))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_2"){
+      } else if (input$groupCompare_g1_step2_plotLegendPosition=="legend_2"){
         p <- p + theme(legend.position = c(0.01, 0.01), legend.justification = c(0,0))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_3"){
+      } else if (input$groupCompare_g1_step2_plotLegendPosition=="legend_3"){
         p <- p + theme(legend.position = c(0.99, 0.99), legend.justification = c(1,1))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_4"){
+      } else if (input$groupCompare_g1_step2_plotLegendPosition=="legend_4"){
         p <- p + theme(legend.position = c(0.99, 0.01), legend.justification = c(1,0))
-      } else if (input$groupCompare_g1_step2_plotLegend=="legend_5"){
+      } else if (input$groupCompare_g1_step2_plotLegendPosition=="legend_5"){
         p <- p + theme(legend.position = c(0.01, 0.99), legend.justification = c(1,0))
       } else {
-        p <- p + theme(legend.position=input$groupCompare_g1_step2_plotLegend)
+        p <- p + theme(legend.position=input$groupCompare_g1_step2_plotLegendPosition)
       }
       
       return(p)
