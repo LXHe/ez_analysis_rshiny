@@ -896,66 +896,54 @@ rep_anova_func <- function(ds, id, tp, value, group=NULL){
 }
 
 ##### Plot function with single group #####
-plotTypeSingle_func <- function(ds, yVar, ytickNum, plotType, errorBar=NULL, orientation=NULL){
+plotTypeSingle_func <- function(ds, yVar, plotType, errorBar=NULL, orientation=NULL){
   if (plotType == "boxplot"){
-      p <- ggboxplot(
-        data=ds, y=yVar, outlier.shape=NA, 
-        bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
-        orientation=ifelse(orientation, "horizontal", "vertical")
-      )
-      p <- p +
-        scale_y_continuous(
-          n.breaks = ytickNum, 
-          expand = expansion(mult = c(0.05, 0.1))
-        )
+    p <- ggboxplot(
+      data=ds, y=yVar, outlier.shape=NA, 
+      bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
+      orientation=ifelse(orientation, "horizontal", "vertical")
+    )
   } else if (plotType=="barplot"){
     ds_summary <- ds %>% 
       summarise(mean=mean(!!sym(yVar)), sd=sd(!!sym(yVar)))
     
-    if (errorBar=="error_0"){
-      p <- ggbarplot(data=ds, y=yVar, add="mean") 
-    } else if (errorBar=="error_1"){ # Full errorbar
-      p <- ggbarplot(data=ds, y=yVar, add="mean_sd") 
-    } else if (errorBar=="error_2"){ # Half errorbar
-      p <- ggbarplot(data=ds, y=yVar, add="mean_sd", error.plot = "upper_errorbar") 
-    }
+    errorBar_params <- switch (
+      errorBar,
+      error_0 = list(add="mean"), # No errorbar
+      error_1 = list(add="mean_sd"), # Full errorbar
+      error_2 = list(add="mean_sd", error.plot = "upper_errorbar") # Half errorbar
+    )
+    
+    p <- do.call(
+      ggbarplot,
+      c(
+        list(data=ds, y=yVar),
+        errorBar_params
+      )
+    )
     
     # Set x-axis to 0 if the means are negative
     if (any(ds_summary$mean<0)){
-      p <- p + geom_hline(yintercept=0) +
+      p <- p + 
+        geom_hline(yintercept=0) +
         scale_y_continuous(
-          n.breaks = ytickNum, 
           expand = expansion(mult = c(0.05, 0.1))
         )
     } else {
-      p <- p +
+      p <- p + 
         scale_y_continuous(
-          n.breaks = ytickNum, 
           expand = expansion(mult = c(0, 0.1))
         )
-    }
-  } else {
-      if (errorBar=="error_0"){
-        p <- ggline(data=ds, y=yVar, add="mean") 
-      } else if (errorBar=="error_1"){ # Full errorbar
-        p <- ggline(data=ds, y=yVar, add="mean_sd") 
-      } else if (errorBar=="error_2"){ # Half errorbar
-        p <- ggline(data=ds, y=yVar, add="mean_sd", error.plot = "upper_errorbar") 
-      }
-    
-      p <- p +
-        scale_y_continuous(
-          n.breaks = ytickNum, 
-          expand = expansion(mult = c(0.05, 0.1))
-        )
+    } 
   }
+  else {p <- ggscatter(data=ds, y=yVar)} # Scatter pplot
   
   p <- p + theme_bw()
   return(p)
 }
 
 ##### Plot function with multiple groups #####
-plotTypeMulti_func <- function(ds, xVar, yVar, grpVar, ytickNum, plotType, errorBar=NULL, orientation=NULL){
+plotTypeMulti_func <- function(ds, xVar, yVar, grpVar, plotType, errorBar=NULL, orientation=NULL){
   
   if (is.character(ds[[xVar]])){ # Check if x is in the type of character
     
@@ -978,104 +966,67 @@ plotTypeMulti_func <- function(ds, xVar, yVar, grpVar, ytickNum, plotType, error
   }
   
   if (plotType == "boxplot"){
-    boxplot_args <- list(
+    boxplot_params <- list(
       data=ds, x=xVar, y=yVar, outlier.shape=NA, 
       bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
       orientation=ifelse(orientation, "horizontal", "vertical")
     )
     if (grpVar!="NULL"){
-      boxplot_args$color <- grpVar
+      boxplot_params$color <- grpVar
     }
     p <- do.call(
       ggboxplot,
-      boxplot_args
+      boxplot_params
     )
-    # if (grpVar=="NULL"){
-    #   p <- ggboxplot(
-    #     data=ds, x=xVar, y=yVar, outlier.shape=NA, 
-    #     bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
-    #     orientation=ifelse(orientation, "horizontal", "vertical")
-    #   ) 
-    # }
-    # else {
-    #   p <- ggboxplot(
-    #     data=ds, x=xVar, y=yVar, color=grpVar, 
-    #     outlier.shape=NA, bxp.errorbar=TRUE, bxp.errorbar.width=0.3,
-    #     orientation=ifelse(orientation, "horizontal", "vertical")
-    #   ) 
-    # }
-    
-    p <- p +
-      scale_y_continuous(
-        n.breaks = ytickNum, 
-        expand = expansion(mult = c(0.05, 0.1))
-      )
   } else if (plotType=="barplot"){
-    if (grpVar=="NULL"){
-      if (errorBar=="error_0"){
-        p <- ggbarplot(data=ds, x=xVar, y=yVar, add="mean") 
-      } else if (errorBar=="error_1"){ # Full errorbar
-        p <- ggbarplot(data=ds, x=xVar, y=yVar, add="mean_sd") 
-      } else if (errorBar=="error_2"){ # Half errorbar
-        p <- ggbarplot(data=ds, x=xVar, y=yVar, add="mean_sd", error.plot = "upper_errorbar") 
-      }
+    errorBar_params <- switch (
+      errorBar,
+      error_0 = list(add="mean"), # No errorbar
+      error_1 = list(add="mean_sd"), # Full errorbar
+      error_2 = list(add="mean_sd", error.plot = "upper_errorbar") # Half errorbar
+    )
+    if (grpVar!="NULL"){
+      errorBar_params$fill <- grpVar
     }
-    else{
-      if (errorBar=="error_0"){
-        p <- ggbarplot(data=ds, x=xVar, y=yVar, fill=grpVar, add="mean") 
-      } else if (errorBar=="error_1"){ # Full errorbar
-        p <- ggbarplot(data=ds, x=xVar, y=yVar, fill=grpVar, add="mean_sd") 
-      } else if (errorBar=="error_2"){ # Half errorbar
-        p <- ggbarplot(data=ds, x=xVar, y=yVar, fill=grpVar, color=grpVar, add="mean_sd") 
-      }
-    }
+    p <- do.call(
+      ggbarplot,
+      c(
+        list(data=ds, x=xVar, y=yVar),
+        errorBar_params
+      )
+    )
     
     # Set x-axis to 0 if the means are negative
     if (any(ds_summary$mean<0)){
-      p <- p + geom_hline(yintercept=0) +
+      p <- p + 
+        geom_hline(yintercept=0) +
         scale_y_continuous(
-          n.breaks = ytickNum, 
           expand = expansion(mult = c(0.05, 0.1))
         )
     } else {
-      p <- p +
+      p <- p + 
         scale_y_continuous(
-          n.breaks = ytickNum, 
           expand = expansion(mult = c(0, 0.1))
         )
     }
   } else {
-    if (grpVar=="NULL"){
-      if (errorBar=="error_0"){
-        p <- ggline(data=ds, x=xVar, y=yVar, add="mean") 
-      } else if (errorBar=="error_1"){ # Full errorbar
-        p <- ggline(data=ds, x=xVar, y=yVar, add="mean_sd") 
-      } else if (errorBar=="error_2"){ # Half errorbar
-        p <- ggline(
-          data=ds, x=xVar, y=yVar, 
-          add="mean_sd", error.plot = "upper_errorbar"
-        ) 
-      }
+    if (xVar==grpVar){grpVar <- "steelblue"}
+    errorBar_params <- switch (
+      errorBar,
+      error_0 = list(add="mean"), # No errorbar
+      error_1 = list(add="mean_sd"), # Full errorbar
+      error_2 = list(add="mean_sd", error.plot = "upper_errorbar") # Half errorbar
+    )
+    if (grpVar!="NULL"){
+      errorBar_params$color <- grpVar
     }
-    else {
-      if (xVar==grpVar){grpVar <- "steelblue"}
-      if (errorBar=="error_0"){
-        p <- ggline(data=ds, x=xVar, y=yVar, color=grpVar, add="mean") 
-      } else if (errorBar=="error_1"){ # Full errorbar
-        p <- ggline(data=ds, x=xVar, y=yVar, color=grpVar, add="mean_sd") 
-      } else if (errorBar=="error_2"){ # Half errorbar
-        p <- ggline(
-          data=ds, x=xVar, y=yVar, 
-          color=grpVar, add="mean_sd",
-          error.plot = "upper_errorbar"
-        ) 
-      }
-    }
-    p <- p +
-      scale_y_continuous(
-        n.breaks = ytickNum, 
-        expand = expansion(mult = c(0.05, 0.1))
+    p <- do.call(
+      ggline,
+      c(
+        list(data=ds, x=xVar, y=yVar),
+        errorBar_params
       )
+    )
   }
   
   p <- p + theme_bw()

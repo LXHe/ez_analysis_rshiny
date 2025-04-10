@@ -601,7 +601,6 @@ function(input, output, session) {
         p <- plotTypeSingle_func(
           ds = compareGroup_g1_ds(), 
           yVar = input$groupCompare_g1_step2_value, 
-          ytickNum = input$groupCompare_g1_step2_plotYtickNum,
           plotType = input$groupCompare_g1_step2_plotType,
           errorBar = input$groupCompare_g1_step2_plotError,
           orientation = input$groupCompare_g1_step2_plotOrientation
@@ -618,7 +617,6 @@ function(input, output, session) {
           xVar = input$groupCompare_g1_step2_tp, 
           yVar = input$groupCompare_g1_step2_value, 
           grpVar = grpVar, 
-          ytickNum = input$groupCompare_g1_step2_plotYtickNum,
           plotType = input$groupCompare_g1_step2_plotType,
           errorBar = input$groupCompare_g1_step2_plotError,
           orientation = input$groupCompare_g1_step2_plotOrientation
@@ -650,9 +648,11 @@ function(input, output, session) {
             hjust = input$groupCompare_g1_step2_plotTitlePosition,
             size = input$groupCompare_g1_step2_plotTitleFontSize
           ),
-          axis.text = element_text(size=input$groupCompare_g1_step2_plotAxisFontSize),
-          axis.title = element_text(size=input$groupCompare_g1_step2_plotAxisFontSize)
-        )
+          axis.text.x = element_text(size = input$groupCompare_g1_step2_plotXtickFontSize),
+          axis.text.y = element_text(size = input$groupCompare_g1_step2_plotYtickFontSize),
+          axis.title.x = element_text(size=input$groupCompare_g1_step2_plotXlabelFontSize),
+          axis.title.y = element_text(size=input$groupCompare_g1_step2_plotYlabelFontSize)
+        ) 
       
       if (input$groupCompare_g1_step2_plotType=="boxplot"){
         # Add jitter
@@ -703,7 +703,7 @@ function(input, output, session) {
     },
     content = function(file) {
       # Process dynamic parameters
-      params <- switch(
+      download_params <- switch(
         input$groupCompare_g1_step2_plotDownload_format,
         png = list(device = "png"),
         jpeg = list(device = "jpeg", quality = input$groupCompare_g1_step2_plotDownload_quality),
@@ -721,7 +721,7 @@ function(input, output, session) {
             units = input$groupCompare_g1_step2_plotDownload_unit,
             limitsize=FALSE # Allow large size
           ),
-          params
+          download_params
         )
       )
     }
