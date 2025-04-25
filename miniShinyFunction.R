@@ -70,6 +70,19 @@ wide2long_func <- function(ds, colsName){
     ) 
 }
 
+##### Dataset transpose function #####
+transpose_func <- function(ds, varTarget){
+  ds_cvt <- as.data.table(ds) # Convert to data.table format
+  ds_cvt_t <- transpose(ds_cvt) # Transpose the dataset
+  
+  colnames(ds_cvt_t) <- make.unique(as.character(ds[[varTarget]]), sep = "_")  # Generate unique column names(e.g., gender, gender_1)
+  target_index <- which(colnames(ds_cvt) == varTarget)
+  ds_cvt_t <- ds_cvt_t %>% 
+    slice(-target_index) %>% # Remove the first row
+    mutate(!!sym(varTarget) := colnames(ds_cvt)[colnames(ds_cvt) != varTarget]) %>% # Set the last column as column names of the original dataset
+    setcolorder(c(varTarget, names(ds_cvt_t)[-ncol(ds_cvt_t)])) # Reorder columns
+  return(ds_cvt_t)
+}
 
 #### Tab:rawData Function ####
 ##### Normality test analysis function #####

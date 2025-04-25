@@ -1,3 +1,4 @@
+library(data.table)
 library(ggpubr)
 library(ggsci)
 library(haven)
@@ -13,6 +14,9 @@ library(tidyverse)
 source("miniShinyFunction.R", local=TRUE) # Load customised library: miniShinyFunction.R
 
 showtext_auto() #Chinese text presentation in plots
+
+# Set upload file size to 200MB
+options(shiny.maxRequestSize = 200 * 1024^2)
 
 #### Define color ####
 color_lvl_1 <- "#54278f" # Dark purple for variable type, first variable level and example
@@ -918,6 +922,74 @@ function(input, output, session) {
   
   output$dataProcess_dataFormat_tbl <- renderDT({
     run_dataProcess_dataFormat_tbl() %>% 
+      datatable(
+        filter = "top",
+        extensions = "Buttons",
+        rownames= FALSE, # Remove rownames when exporting data
+        options = list(
+          autoWidth=TRUE,
+          dom = "Bftrip",
+          scrollX = TRUE,
+          buttons = list(
+            list(extend = 'excel', title = NULL), # Remove "Exported data" title
+            "csv")
+        )
+      )
+  }, server=FALSE)
+  
+  ###### Tool 3: Dataset transpose ######
+  # Import dataset
+  run_dataProcess_dataTranspose_importFile <- reactive({importFile_func(input$dataProcess_dataTranspose_importFile)})
+  
+  # Update variable for input
+  observe({
+    updatePickerInput(
+      session = session,
+      "dataProcess_dataTranspose_varSelect",
+      choices = run_dataProcess_dataTranspose_importFile()[[2]]
+    )
+  })
+  
+  observe({
+    updatePickerInput(
+      session = session,
+      "dataProcess_dataTranspose_varTarget",
+      choices = input$dataProcess_dataTranspose_varSelect,
+      selected = input$dataProcess_dataTranspose_varSelect[1]
+    )
+  })
+  
+  # Run dataProcess
+  run_dataProcess_dataTranspose_tbl <- eventReactive(
+    input$dataProcess_dataTranspose_cfmRun,
+    {
+      req(run_dataProcess_dataTranspose_importFile())
+      req(input$dataProcess_dataTranspose_varSelect)
+      req(input$dataProcess_dataTranspose_varTarget)
+      
+      dataProcess_ds_tmp <- run_dataProcess_dataTranspose_importFile()[[1]] %>% 
+        select(all_of(input$dataProcess_dataTranspose_varSelect))
+      
+      dataProcess_ds <- transpose_func(
+        ds = dataProcess_ds_tmp,
+        varTarget = input$dataProcess_dataTranspose_varTarget
+      )
+      
+      return(dataProcess_ds)
+    }
+  )
+  
+  run_dataProcess_dataTranspose_tbl_msg <- eventReactive(
+    input$dataProcess_dataTranspose_cfmRun,
+    {
+      markdown("在生成表格后，还可对表格中的变量进行筛选；完成处理后，点击`Excel`或者`CSV`按钮保存为对应格式的文件。")
+    }
+  )
+  
+  output$dataProcess_dataTranspose_tbl_msg <- renderText({run_dataProcess_dataTranspose_tbl_msg()})
+  
+  output$dataProcess_dataTranspose_tbl <- renderDT({
+    run_dataProcess_dataTranspose_tbl() %>% 
       datatable(
         filter = "top",
         extensions = "Buttons",

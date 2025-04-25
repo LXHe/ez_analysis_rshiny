@@ -871,6 +871,7 @@ body <- dashboardBody(
         width = NULL,
         solidHeader = TRUE,
         collapsible = TRUE,
+        collapsed = TRUE,
         label = actionBttn(
           inputId = "dataProcess_missVal_cfmRun",
           label = tags$span(
@@ -957,6 +958,7 @@ body <- dashboardBody(
         width = NULL,
         solidHeader = TRUE,
         collapsible = TRUE,
+        collapsed = TRUE,
         label = actionBttn(
           inputId = "dataProcess_dataFormat_cfmRun",
           label = tags$span(
@@ -1071,6 +1073,126 @@ body <- dashboardBody(
             width = 12,
             htmlOutput("dataProcess_dataFormat_tbl_msg"),
             DTOutput("dataProcess_dataFormat_tbl")
+          )
+        )
+      ),
+      
+      ####### Dataset transpose #######
+      shinydashboardPlus::box(
+        style = "margin: 0px",
+        title = "数据转置",
+        status = "primary",
+        width = NULL,
+        solidHeader = TRUE,
+        collapsible = TRUE,
+        collapsed = TRUE,
+        label = actionBttn(
+          inputId = "dataProcess_dataTranspose_cfmRun",
+          label = tags$span(
+            tags$span(icon("circle-play")),
+            tags$span("运行", style="font-size: 13px")
+          ),
+          size = "s",
+          color = "primary"
+        ),
+        
+        fluidRow(
+          column(
+            width = 4,
+            fluidRow(
+              column(
+                width = 6,
+                htmlTable(
+                  matrix(
+                    c(1,160,45,
+                      2,170,50,
+                      "...","...","...",
+                      "n",175,52),
+                    ncol=3, byrow = TRUE
+                  ),
+                  header =  c("ID","&emsp;Height&emsp;","Weight"),
+                  caption = markdown("数据转置前："),
+                  collapse = "separate_shiny"
+                )
+              ),
+              column(
+                width = 6,
+                htmlTable(
+                  matrix(
+                    c("Height","&emsp;160",170,"...",175,
+                      "Weight","&emsp;45",50,"...",52),
+                    ncol=5, byrow = TRUE
+                  ),
+                  header =  c("ID","&emsp;1","&emsp;2&emsp;","...","&emsp;n"),
+                  caption = markdown("数据转置后："),
+                  collapse = "separate_shiny"
+                )
+              )
+            )
+          ),
+          
+          column(
+            width = 8,
+            fluidRow(
+              column(
+                width = 6,
+                fileInput(
+                  inputId = "dataProcess_dataTranspose_importFile",
+                  label = tags$span(
+                    "数据导入",
+                    tags$span(icon("exclamation-circle")) %>%
+                      add_prompt(
+                        message = "支持csv,excel,SAS和stata文件",
+                        position = "right"
+                      )
+                  ),
+                  accept = c(".csv", ".xlsx", ".xls", ".sas7bdat", ".dta"),
+                  buttonLabel = "选择文件...",
+                  placeholder = "尚未选择"
+                ),
+                pickerInput(
+                  inputId = "dataProcess_dataTranspose_varSelect",
+                  label = tags$span(
+                    "选取变量",
+                    tags$span(icon("exclamation-circle")) %>%
+                      add_prompt(
+                        message = "最终生成的数据仅会包含所选取的变量",
+                        size = "medium",
+                        position = "right"
+                      )
+                  ),
+                  choices = NULL,
+                  options = pickerOptions(
+                    "actionsBox" = TRUE,
+                    "title" = "尚未选择",
+                    "selectAllText" = "全部选择",
+                    "deselectAllText" = "全部清除"
+                  ),
+                  multiple = TRUE
+                ),
+                pickerInput(
+                  inputId = "dataProcess_dataTranspose_varTarget",
+                  label = tags$span(
+                    "选取转置目标变量",
+                    tags$span(icon("exclamation-circle")) %>%
+                      add_prompt(
+                        message = "对应示例中的ID",
+                        size = "medium",
+                        position = "right"
+                      )
+                  ),
+                  choices = NULL,
+                  options = pickerOptions("title" = "尚未选择")
+                )
+              )
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            width = 12,
+            htmlOutput("dataProcess_dataTranspose_tbl_msg"),
+            DTOutput("dataProcess_dataTranspose_tbl")
           )
         )
       )
